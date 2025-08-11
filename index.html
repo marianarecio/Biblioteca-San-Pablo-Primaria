@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca San Pablo</title>
+  <style>
+    body {
+      font-family: 'Jost', sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.2em;
+    }
+    .scan-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 400px;
+      margin: auto;
+      margin-bottom: 40px;
+    }
+    .scan-input {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      width: 100%;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #aed6dc;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    #qr-reader {
+      margin-top: 10px;
+    }
+    table {
+      margin: auto;
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 800px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #aaa;
+      text-align: center;
+    }
+    th {
+      background-color: #d5e8d4;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+  <h1>📚 Biblioteca Primaria Colegio San Pablo</h1>
+  <p style="text-align: justify; font-size: 1.1em; max-width: 800px; margin: auto;">
+    Escaneá el QR del <strong>responsable</strong>, luego del <strong>alumno</strong> y finalmente del <strong>libro</strong> para registrar un préstamo. Solo se muestran los préstamos del día actual.
+  </p>
+
+  <div class="scan-section">
+    <div class="scan-input">
+      <label>Responsable</label>
