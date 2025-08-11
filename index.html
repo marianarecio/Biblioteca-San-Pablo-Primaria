@@ -1,184 +1,200 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Biblioteca San Pablo</title>
-<style>
-body {
-font-family: 'Jost', sans-serif;
-background-color: #f5f5f5;
-text-align: center;
-padding: 20px;
-}
-h1 {
-font-size: 2.5em;
-margin-bottom: 0.2em;
-}
-.scan-section {
-display: flex;
-flex-direction: column;
-gap: 20px;
-max-width: 400px;
-margin: auto;
-margin-bottom: 40px;
-}
-.scan-input {
-display: flex;
-flex-direction: column;
-align-items: center;
-}
-input {
-padding: 10px;
-border-radius: 12px;
-border: 1px solid #ccc;
-width: 100%;
-margin-top: 5px;
-}
-button {
-margin-top: 10px;
-padding: 10px 20px;
-background-color: #aed6dc;
-border: none;
-border-radius: 20px;
-cursor: pointer;
-font-size: 1em;
-}
-#qr-reader {
-margin-top: 10px;
-}
-table {
-margin: auto;
-border-collapse: collapse;
-width: 100%;
-max-width: 800px;
-}
-th, td {
-padding: 10px;
-border: 1px solid #aaa;
-text-align: center;
-}
-th {
-background-color: #d5e8d4;
-}
-</style>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca San Pablo</title>
+  <style>
+    body {
+      font-family: 'Jost', sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.5em;
+    }
+    p {
+      font-size: 1.1em;
+      text-align: justify;
+      max-width: 800px;
+      margin: auto auto 30px auto;
+    }
+    .scan-section {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      max-width: 400px;
+      margin: auto;
+    }
+    .scan-input {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      width: 100%;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 8px;
+      padding: 10px 20px;
+      background-color: #aed6dc;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    #qr-reader {
+      margin-top: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+      font-size: 2em;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 800px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #aaa;
+      text-align: center;
+    }
+    th {
+      background-color: #d5e8d4;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-<h1>📚 Biblioteca Primaria Colegio San Pablo</h1>
-<p style="text-align: justify; font-size: 1.1em; max-width: 800px; margin: auto;">
-Escaneá el QR del <strong>responsable</strong>, luego del <strong>alumno</strong> y finalmente del <strong>libro</strong> para registrar un préstamo. Solo se muestran los préstamos del día actual.
-</p>
+  <h1>📚 Biblioteca Primaria Colegio San Pablo</h1>
+  <p>
+    Escaneá el código QR del <strong>responsable</strong>, luego del <strong>alumno</strong> y finalmente del <strong>libro</strong> para registrar un préstamo. En pantalla solo se muestran los préstamos realizados hoy.
+  </p>
 
-<div class="scan-section">
-<div class="scan-input">
-<label>Responsable</label>
-<input id="responsableInput" placeholder="Esperando escaneo..." readonly />
-<button onclick="startScan('responsableInput')">Escanear QR</button>
-</div>
-<div class="scan-input">
-<label>Alumno</label>
-<input id="alumnoInput" placeholder="Esperando escaneo..." readonly />
-<button onclick="startScan('alumnoInput')">Escanear QR</button>
-</div>
-<div class="scan-input">
-<label>Libro</label>
-<input id="libroInput" placeholder="Esperando escaneo..." readonly />
-<button onclick="startScan('libroInput')">Escanear QR</button>
-</div>
-</div>
+  <div class="scan-section">
+    <div class="scan-input">
+      <label for="responsableInput">Responsable</label>
+      <input id="responsableInput" placeholder="Esperando escaneo..." readonly />
+      <button onclick="startScan('responsableInput')">Escanear QR</button>
+    </div>
+    <div class="scan-input">
+      <label for="alumnoInput">Alumno</label>
+      <input id="alumnoInput" placeholder="Esperando escaneo..." readonly />
+      <button onclick="startScan('alumnoInput')">Escanear QR</button>
+    </div>
+    <div class="scan-input">
+      <label for="libroInput">Libro</label>
+      <input id="libroInput" placeholder="Esperando escaneo..." readonly />
+      <button onclick="startScan('libroInput')">Escanear QR</button>
+    </div>
+  </div>
 
-<div id="qr-reader" style="display:none;"></div>
+  <div id="qr-reader" style="display: none;"></div>
 
-<h2>📋 Préstamos Registrados</h2>
-<table id="prestamosTable">
-<thead>
-<tr>
-<th>Responsable</th>
-<th>Alumno</th>
-<th>Libro</th>
-<th>Fecha</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+  <h2>📋 Préstamos Registrados</h2>
+  <table id="prestamosTable">
+    <thead>
+      <tr>
+        <th>Responsable</th>
+        <th>Alumno</th>
+        <th>Libro</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<script>
-const qrReader = document.getElementById("qr-reader");
-let activeInputId = "";
+  <script>
+    const qrReader = document.getElementById("qr-reader");
+    let activeInputId = "";
 
-function startScan(inputId) {
-activeInputId = inputId;
-qrReader.style.display = "block";
-qrReader.innerHTML = "";
-const html5QrCode = new Html5Qrcode("qr-reader");
+    function startScan(inputId) {
+      activeInputId = inputId;
+      qrReader.style.display = "block";
+      qrReader.innerHTML = "";
 
-Html5Qrcode.getCameras().then(devices => {
-if (devices && devices.length) {
-html5QrCode.start(
-{ facingMode: "environment" },
-{ fps: 10, qrbox: 200 },
-qrCodeMessage => {
-document.getElementById(inputId).value = qrCodeMessage;
-html5QrCode.stop().then(() => {
-qrReader.innerHTML = "";
-qrReader.style.display = "none";
-if (allFieldsFilled()) {
-registrarPrestamo();
-}
-});
-},
-errorMessage => {}
-).catch(err => {
-alert("Error al iniciar la cámara: " + err);
-});
-}
-});
-}
+      const html5QrCode = new Html5Qrcode("qr-reader");
 
-function allFieldsFilled() {
-return (
-document.getElementById("responsableInput").value &&
-document.getElementById("alumnoInput").value &&
-document.getElementById("libroInput").value
-);
-}
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+          html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 200 },
+            qrCodeMessage => {
+              document.getElementById(inputId).value = qrCodeMessage;
+              html5QrCode.stop().then(() => {
+                qrReader.innerHTML = "";
+                qrReader.style.display = "none";
+                if (allFieldsFilled()) {
+                  registrarPrestamo();
+                }
+              });
+            },
+            errorMessage => {}
+          ).catch(err => {
+            alert("Error al iniciar la cámara: " + err);
+          });
+        }
+      });
+    }
 
-function registrarPrestamo() {
-const responsable = document.getElementById("responsableInput").value;
-const alumno = document.getElementById("alumnoInput").value;
-const libro = document.getElementById("libroInput").value;
-const fecha = new Date().toISOString().split("T")[0];
+    function allFieldsFilled() {
+      return (
+        document.getElementById("responsableInput").value &&
+        document.getElementById("alumnoInput").value &&
+        document.getElementById("libroInput").value
+      );
+    }
 
-fetch("https://script.google.com/macros/s/AKfycbzExDf9VsK8UUks9a3gfitV5nJPQMAYePxJUaecd2EVX18A6uADHIuTEWos1Rr6YBoNRw/exec", {
-method: "POST",
-body: JSON.stringify({ responsable, alumno, libro, fecha }),
-headers: { "Content-Type": "application/json" }
-}).then(response => response.json()).then(data => {
-if (data.status === "ok") {
-agregarAFila(responsable, alumno, libro, fecha);
-limpiarCampos();
-} else {
-alert("Error al guardar en la hoja de cálculo");
-}
-});
-}
+    function registrarPrestamo() {
+      const responsable = document.getElementById("responsableInput").value;
+      const alumno = document.getElementById("alumnoInput").value;
+      const libro = document.getElementById("libroInput").value;
+      const fecha = new Date().toISOString().split("T")[0];
 
-function agregarAFila(responsable, alumno, libro, fecha) {
-const hoy = new Date().toISOString().split("T")[0];
-if (fecha !== hoy) return;
+      fetch("https://script.google.com/macros/s/AKfycbzExDf9VsK8UUks9a3gfitV5nJPQMAYePxJUaecd2EVX18A6uADHIuTEWos1Rr6YBoNRw/exec", {
+        method: "POST",
+        body: JSON.stringify({ responsable, alumno, libro, fecha }),
+        headers: { "Content-Type": "application/json" }
+      }).then(response => response.json()).then(data => {
+        if (data.status === "ok") {
+          agregarAFila(responsable, alumno, libro, fecha);
+          limpiarCampos();
+        } else {
+          alert("Error al guardar en la hoja de cálculo");
+        }
+      }).catch(error => {
+        alert("Error de conexión con Google Sheets");
+        console.error(error);
+      });
+    }
 
-const tabla = document.querySelector("#prestamosTable tbody");
-const fila = document.createElement("tr");
-fila.innerHTML = `<td>${responsable}</td><td>${alumno}</td><td>${libro}</td><td>${fecha}</td>`;
-tabla.appendChild(fila);
-}
+    function agregarAFila(responsable, alumno, libro, fecha) {
+      const hoy = new Date().toISOString().split("T")[0];
+      if (fecha !== hoy) return;
 
-function limpiarCampos() {
-document.getElementById("responsableInput").value = "";
-document.getElementById("alumnoInput").value = "";
-document.getElementById("libroInput").value = "";
-}
-</script>
+      const tabla = document.querySelector("#prestamosTable tbody");
+      const fila = document.createElement("tr");
+      fila.innerHTML = `<td>${responsable}</td><td>${alumno}</td><td>${libro}</td><td>${fecha}</td>`;
+      tabla.appendChild(fila);
+    }
+
+    function limpiarCampos() {
+      document.getElementById("responsableInput").value = "";
+      document.getElementById("alumnoInput").value = "";
+      document.getElementById("libroInput").value = "";
+    }
+  </script>
 </body>
 </html>
