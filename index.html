@@ -245,8 +245,10 @@
   }
   #scanner {
     background: white;
-    padding: 20px;
+    padding: 10px;
     border-radius: 12px;
+    width: 300px;
+    height: 300px;
   }
 </style>
 <div id="scannerModal">
@@ -330,13 +332,14 @@
   let currentScanner = null;
   function startScanner(inputId) {
     const modal = document.getElementById("scannerModal");
-    modal.style.display = "flex";
+    modal.style.display = "flex"; // Mostrar modal antes de iniciar
     const scannerDiv = document.getElementById("scanner");
-    scannerDiv.innerHTML = "";
+    scannerDiv.innerHTML = ""; // Limpiar antes de iniciar
+
     currentScanner = new Html5Qrcode("scanner");
     currentScanner.start(
       { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
       qrCodeMessage => {
         document.getElementById(inputId).value = qrCodeMessage;
         currentScanner.stop().then(() => {
@@ -344,6 +347,9 @@
           scannerDiv.innerHTML = "";
           currentScanner = null;
         });
+      },
+      errorMessage => {
+        // Ignorar errores de lectura
       }
     ).catch(err => {
       alert("No se pudo acceder a la cámara");
