@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+ <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Biblioteca Primaria Colegio San Pablo</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Biblioteca Primaria Colegio San Pablo
+  </title>
   <!-- Fuente Jost -->
-  <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Jost&amp;display=swap" rel="stylesheet"/>
   <style>
-    body {
+   body {
       font-family: 'Jost', sans-serif;
       background-color: #fff;
       color: #333;
@@ -26,9 +28,9 @@
       margin-bottom: 0.3em;
       margin-top: 0.1em;
     }
-    /* Modal escáner */
+    /* Contenedor modal para el scanner */
     #scannerModal {
-      display: none;
+      display: none; /* oculto por defecto */
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.5);
@@ -128,7 +130,8 @@
     .search-box {
       margin-bottom: 18px;
     }
-    /* Mejoras para móviles */
+
+    /* --- Mejoras para móviles --- */
     @media (max-width: 600px) {
       body {
         padding: 8px;
@@ -175,205 +178,251 @@
     }
   </style>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-</head>
-<body>
+ </head>
+ <body>
   <!-- Imagen escudo en el encabezado -->
   <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
-  <h1>📚 Biblioteca Primaria Colegio San Pablo</h1>
+  <h1>
+   📚 Biblioteca Primaria Colegio San Pablo
+  </h1>
   <p style="font-size:1em; color:#666; margin-bottom:14px;">
-    Si estás usando un celular, acepta el permiso de cámara para escanear códigos QR.
+   Si est&aacute;s usando un celular, acepta el permiso de c&aacute;mara para escanear c&oacute;digos QR.
   </p>
   <p style="font-size: 1.3em; max-width: 98%; margin: 5px auto; line-height: 1.6;">
-    Escaneá primero el código QR del
-    <strong>alumno</strong> y luego el código QR del
-    <strong>libro</strong> para registrar un préstamo.<br/>
-    También podés buscar libros y ver qué alumnos los tomaron, o buscar alumnos para ver qué libros tienen en préstamo.
+   Escane&aacute; primero el c&oacute;digo QR del
+   <strong>
+    alumno
+   </strong>
+   y luego el c&oacute;digo QR del
+   <strong>
+    libro
+   </strong>
+   para registrar un pr&eacute;stamo.
+   <br/>
+   Tambi&eacute;n pod&eacute;s buscar libros y ver qu&eacute; alumnos los tomaron, o buscar alumnos para ver qu&eacute; libros tienen en pr&eacute;stamo.
   </p>
   <div>
-    <input id="responsableInput" placeholder="Escaneá el QR del responsable" readonly type="text"/>
-    <button onclick="startScanner('responsableInput')">📷</button>
-    <input id="alumnoInput" placeholder="Escaneá el QR del alumno" readonly type="text"/>
-    <button onclick="startScanner('alumnoInput')">📷</button>
-    <input id="libroInput" placeholder="Escaneá el QR del libro" readonly type="text"/>
-    <button onclick="startScanner('libroInput')">📷</button>
-    <button onclick="registrarPrestamo()" style="background-color:#4a4e69;">Registrar Préstamo</button>
+   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly="True" type="text"/>
+   <button onclick="startScanner('responsableInput')">
+    📷
+   </button>
+   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly="" type="text"/>
+   <button onclick="startScanner('alumnoInput')">
+    📷
+   </button>
+   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
+   <button onclick="startScanner('libroInput')">
+    📷
+   </button>
+   <button onclick="registrarPrestamo()" style="background-color:#4a4e69;">
+    Registrar Pr&eacute;stamo
+   </button>
   </div>
 
-  <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">📋 Préstamos Registrados</h2>
+  <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">
+   📋 Pr&eacute;stamos Registrados
+  </h2>
   <table>
-    <thead>
-      <tr>
-        <th>Responsable</th>
-        <th>Libro</th>
-        <th>Alumno</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody id="prestamosTable"></tbody>
+   <thead>
+    <tr>
+     <th>
+      Responsable
+     </th>
+     <th>
+      Libro
+     </th>
+     <th>
+      Alumno
+     </th>
+     <th>
+      Fecha
+     </th>
+    </tr>
+   </thead>
+   <tbody id="prestamosTable">
+   </tbody>
   </table>
 
   <div class="search-box">
-    <h3>🔍 Buscar información</h3>
-    <label class="search-label" for="buscarLibro">Buscar por libro</label>
-    <input id="buscarLibro" placeholder="Ej: LIB001 o título" type="text"/>
-    <button onclick="startScanner('buscarLibro')">📷</button>
-    <button onclick="buscarPorLibro()">Buscar</button>
-
-    <label class="search-label" for="buscarAlumno">Buscar por alumno</label>
-    <input id="buscarAlumno" placeholder="Ej: ALU001 o nombre" type="text"/>
-    <button onclick="startScanner('buscarAlumno')">📷</button>
-    <button onclick="buscarPorAlumno()">Buscar</button>
+   <h3>
+    🔍 Buscar informaci&oacute;n
+   </h3>
+   <label class="search-label" for="buscarLibro">
+    Buscar por libro
+   </label>
+   <input id="buscarLibro" placeholder="Ej: LIB001 o t&iacute;tulo" type="text"/>
+   <button onclick="startScanner('buscarLibro')">
+    📷
+   </button>
+   <button onclick="buscarPorLibro()">
+    Buscar
+   </button>
+   <label class="search-label" for="buscarAlumno">
+    Buscar por alumno
+   </label>
+   <input id="buscarAlumno" placeholder="Ej: ALU001 o nombre" type="text"/>
+   <button onclick="startScanner('buscarAlumno')">
+    📷
+   </button>
+   <button onclick="buscarPorAlumno()">
+    Buscar
+   </button>
+  </div>
+  <div id="resultadosBusqueda">
   </div>
 
-  <div id="resultadosBusqueda"></div>
-
-  <!-- Modal para la cámara escáner -->
+  <!-- Modal con el escáner -->
   <div id="scannerModal">
     <div id="scanner"></div>
     <button id="closeScannerBtn" title="Cerrar escáner">×</button>
   </div>
 
-<script>
-  // Cambia esta URL por la de tu Apps Script
-  const SHEETS_WEBHOOK_URL = 'https://script.google.com/a/macros/csanpablo.edu.ar/s/AKfycbzKJIK4JePISCjucpyks97_Gz1JpaGW6E8FK922PXX-CbAeYk8IWIhHpJABGIubSLvTLA/exec';
+  <script>
+   // Cambia esto por la URL de tu Apps Script de Google Sheets
+    const SHEETS_WEBHOOK_URL = 'https://script.google.com/a/macros/csanpablo.edu.ar/s/AKfycbzKJIK4JePISCjucpyks97_Gz1JpaGW6E8FK922PXX-CbAeYk8IWIhHpJABGIubSLvTLA/exec';
 
-  let prestamos = [];
+    let prestamos = [];
 
-  // Función para registrar un préstamo y enviarlo a Google Sheets
-  function registrarPrestamo() {
-    const responsable = document.getElementById('responsableInput').value.trim();
-    const libro = document.getElementById('libroInput').value.trim();
-    const alumno = document.getElementById('alumnoInput').value.trim();
-    if (!responsable || !libro || !alumno) {
-      alert("Escaneá primero el responsable, el libro y el alumno");
-      return;
+    function registrarPrestamo() {
+      const responsable = document.getElementById('responsableInput').value.trim();
+      const libro = document.getElementById('libroInput').value.trim();
+      const alumno = document.getElementById('alumnoInput').value.trim();
+      if (!responsable || !libro || !alumno) {
+        alert("Escaneá primero el libro y el alumno");
+        return;
+      }
+      const fecha = new Date().toLocaleString();
+      prestamos.push({ responsable, libro, alumno, fecha });
+      actualizarTabla();
+      document.getElementById('libroInput').value = "";
+      document.getElementById('alumnoInput').value = "";
+
+      // Enviar a Google Sheets
+      fetch(SHEETS_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ responsable, libro, alumno, fecha })
+      });
+
+      alert("¡Préstamo registrado!");
     }
-    // Fecha en formato YYYY-MM-DD para comparación
-    const fecha = new Date().toISOString().split('T')[0];
-    const fechaCompleta = new Date().toLocaleString();
-    prestamos.push({ responsable, libro, alumno, fecha: fechaCompleta });
-    actualizarTabla();
 
-    // Limpiar inputs libro y alumno para nuevo escaneo
-    document.getElementById('libroInput').value = "";
-    document.getElementById('alumnoInput').value = "";
-    document.getElementById('responsableInput').value = "";
-
-    // Enviar datos a Google Sheets
-    fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ responsable, libro, alumno, fecha })
-    }).catch(err => {
-      console.error('Error al enviar a Google Sheets:', err);
-    });
-
-    alert("¡Préstamo registrado!");
-  }
-
-  // Actualiza la tabla mostrando solo préstamos del día actual
-  function actualizarTabla() {
-    const tabla = document.getElementById("prestamosTable");
-    tabla.innerHTML = "";
-    const hoy = new Date().toISOString().split('T')[0];
-    prestamos.forEach(p => {
-      // Solo mostrar préstamos con fecha del día actual
-      const pFecha = new Date(p.fecha).toISOString().split('T')[0];
-      if (pFecha === hoy) {
+    function actualizarTabla() {
+      const tabla = document.getElementById("prestamosTable");
+      tabla.innerHTML = "";
+      prestamos.forEach(p => {
         const fila = tabla.insertRow();
         fila.insertCell(0).textContent = p.responsable;
         fila.insertCell(1).textContent = p.libro;
         fila.insertCell(2).textContent = p.alumno;
         fila.insertCell(3).textContent = p.fecha;
-      }
-    });
-  }
-
-  // Búsquedas filtradas por libro o alumno
-  function buscarPorLibro() {
-    const consulta = document.getElementById("buscarLibro").value.toLowerCase();
-    const resultados = prestamos.filter(p => p.libro.toLowerCase().includes(consulta));
-    mostrarResultados("Libro", consulta, resultados);
-  }
-
-  function buscarPorAlumno() {
-    const consulta = document.getElementById("buscarAlumno").value.toLowerCase();
-    const resultados = prestamos.filter(p => p.alumno.toLowerCase().includes(consulta));
-    mostrarResultados("Alumno", consulta, resultados);
-  }
-
-  function mostrarResultados(tipo, consulta, resultados) {
-    const contenedor = document.getElementById("resultadosBusqueda");
-    if (!consulta) {
-      contenedor.innerHTML = "";
-      return;
-    }
-    if (resultados.length === 0) {
-      contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
-      return;
-    }
-    let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
-    resultados.forEach(p => {
-      html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
-    });
-    html += "</ul>";
-    contenedor.innerHTML = html;
-  }
-
-  // Variables para el escáner QR
-  let currentScanner = null;
-
-  function startScanner(inputId) {
-    if (currentScanner) {
-      currentScanner.clear().then(() => {
-        document.getElementById("scannerModal").style.display = "none";
       });
     }
-    const scannerModal = document.getElementById("scannerModal");
-    scannerModal.style.display = "flex";
-    scannerModal.dataset.inputId = inputId;
 
-    const scannerDiv = document.getElementById("scanner");
-    scannerDiv.innerHTML = "";
+    function buscarPorLibro() {
+      const consulta = document.getElementById("buscarLibro").value.toLowerCase();
+      const resultados = prestamos.filter(p => p.libro.toLowerCase().includes(consulta));
+      mostrarResultados("Libro", consulta, resultados);
+    }
 
-    currentScanner = new Html5Qrcode("scanner");
+    function buscarPorAlumno() {
+      const consulta = document.getElementById("buscarAlumno").value.toLowerCase();
+      const resultados = prestamos.filter(p => p.alumno.toLowerCase().includes(consulta));
+      mostrarResultados("Alumno", consulta, resultados);
+    }
 
-    currentScanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 280, height: 280 }
-      },
-      qrCodeMessage => {
-        document.getElementById(inputId).value = qrCodeMessage;
+    function mostrarResultados(tipo, consulta, resultados) {
+      const contenedor = document.getElementById("resultadosBusqueda");
+      if (!consulta) {
+        contenedor.innerHTML = "";
+        return;
+      }
+      if (resultados.length === 0) {
+        contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
+        return;
+      }
+      let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
+      resultados.forEach(p => {
+        html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
+      });
+      html += "</ul>";
+      contenedor.innerHTML = html;
+    }
+
+    // Variables para el escáner QR
+    let currentScanner = null;
+
+    function startScanner(inputId) {
+      // Si hay un escáner activo, limpiar y ocultar modal
+      if (currentScanner) {
+        currentScanner.clear().then(() => {
+          document.getElementById("scannerModal").style.display = "none";
+        });
+      }
+      // Mostrar modal escáner
+      const scannerModal = document.getElementById("scannerModal");
+      scannerModal.style.display = "flex";
+      scannerModal.dataset.inputId = inputId; // guardo para usar después
+
+      const scannerDiv = document.getElementById("scanner");
+      scannerDiv.innerHTML = ""; // limpiar contenido
+
+      currentScanner = new Html5Qrcode("scanner");
+
+      currentScanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 280, height: 280 }
+        },
+        qrCodeMessage => {
+          // Al detectar QR, lo asigno al input correspondiente
+          document.getElementById(inputId).value = qrCodeMessage;
+          stopScanner();
+        },
+        errorMessage => {
+          // console.log("Error de escaneo:", errorMessage);
+        }
+      ).catch(err => {
+        alert("No se pudo acceder a la cámara");
         stopScanner();
-      },
-      errorMessage => {
-        // Se ignoran errores de lectura
-      }
-    ).catch(err => {
-      alert("No se pudo acceder a la cámara");
-      stopScanner();
-    });
-  }
-
-  function stopScanner() {
-    if (currentScanner) {
-      currentScanner.stop().then(() => {
-        currentScanner.clear();
-        currentScanner = null;
-        document.getElementById("scannerModal").style.display = "none";
-      }).catch(e => {
-        console.error("Error al detener el escáner:", e);
       });
-    } else {
-      document.getElementById("scannerModal").style.display = "none";
     }
-  }
 
-  document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
+    function stopScanner() {
+      if (currentScanner) {
+        currentScanner.stop().then(() => {
+          currentScanner.clear();
+          currentScanner = null;
+          document.getElementById("scannerModal").style.display = "none";
+        }).catch((e) => {
+          console.error("Error deteniendo el escáner:", e);
+        });
+      } else {
+        document.getElementById("scannerModal").style.display = "none";
+      }
+    }
 
-</script>
-</body>
+    // Botón cerrar modal
+    document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
+  </script>
+
+  <script>
+    // Script de prueba para mostrar el modal 3 segundos después de cargar la página y probar el botón cerrar
+    const scannerModal = document.getElementById("scannerModal");
+    document.getElementById("closeScannerBtn").addEventListener("click", () => {
+      scannerModal.style.display = "none";
+      console.log("Modal cerrado");
+    });
+    window.onload = () => {
+      setTimeout(() => {
+        scannerModal.style.display = "flex";
+        console.log("Modal visible");
+      }, 3000);
+    };
+  </script>
+ </body>
 </html>
