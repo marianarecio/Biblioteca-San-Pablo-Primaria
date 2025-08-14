@@ -279,38 +279,152 @@
 
   <script>
    // Cambia esto por la URL de tu Apps Script de Google Sheets
-    window.onload = () => {
-  setTimeout(() => {
-    scannerModal.style.display = "flex";
-    console.log("Modal visible");
-  }, 3000);
-};
-   <script>
-  // ... tu código actual ...
+    const SHEETS_WEBHOOK_URL ="https://script.google.com/macros/s/AKfycbwg-f66hkw2TIOCcIVxLQeawhze-fooBcHjEGyl2X6ghSZxUspo9yBpCFZP7jvew0VLuA/exec";
 
-  async function cargarPrestamosDesdeSheets() {
-    try {
-      const response = await fetch(SHEETS_WEBHOOK_URL);
-      if (!response.ok) throw new Error("Error al cargar datos");
-      const data = await response.json();
-      prestamos = data;
+    let prestamos = [];
+
+    function registrarPrestamo() {
+      const responsable = document.getElementById('responsableInput').value.trim();
+      const libro = document.getElementById('libroInput').value.trim();
+      const alumno = document.getElementById('alumnoInput').value.trim();
+      if (!responsable || !libro || !alumno) {
+        alert("Escaneá primero el libro y el alumno");
+        return;
+      }
+      const fecha = new Date().toLocaleString();
+      prestamos.push({ responsable, libro, alumno, fecha });
       actualizarTabla();
-    } catch (error) {
-      console.error("No se pudieron cargar los préstamos:", error);
+      document.getElementById('libroInput').value = "";
+      document.getElementById('alumnoInput').value = "";
+
+      // Enviar a Google Sheets
+      fetch(SHEETS_WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ responsable, libro, alumno, fecha })
+      });
+
+      alert("¡Préstamo registrado!");
     }
-  }
 
-  window.onload = () => {
-    cargarPrestamosDesdeSheets();
+    function actualizarTabla() {
+      const tabla = document.getElementById("prestamosTable");
+      tabla.innerHTML = "";
+      prestamos.forEach(p => {
+        const fila = tabla.insertRow();
+        fila.insertCell(0).textContent = p.responsable;
+        fila.insertCell(1).textContent = p.libro;
+        fila.insertCell(2).textContent = p.alumno;
+        fila.insertCell(3).textContent = p.fecha;
+      });
+    }
 
-    setTimeout(() => {
-      document.getElementById("scannerModal").style.display = "flex";
-      console.log("Modal visible");
-    }, 3000);
-  };
-// ... resto del código ...
-</script>
+    function buscarPorLibro() {
+      const consulta = document.getElementById("buscarLibro").value.toLowerCase();
+      const resultados = prestamos.filter(p => p.libro.toLowerCase().includes(consulta));
+      mostrarResultados("Libro", consulta, resultados);
+    }
 
+    function buscarPorAlumno() {
+      const consulta = document.getElementById("buscarAlumno").value.toLowerCase();
+      const resultados = prestamos.filter(p => p.alumno.toLowerCase().includes(consulta));
+      mostrarResultados("Alumno", consulta, resultados);
+    }
+
+    function mostrarResultados(tipo, consulta, resultados) {
+      const contenedor = document.getElementById("resultadosBusqueda");
+      if (!consulta) {
+        contenedor.innerHTML = "";
+        return;
+      }
+      if (resultados.length === 0) {
+        contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
+        return;
+      }
+      let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
+      resultados.forEach(p => {
+        html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
+      });
+      html += "</ul>";
+      contenedor.innerHTML = html;
+    }
+
+    // Variables para el escáner QR
+    let currentScanner = null;
+
+    function startScanner(inputId) {
+      // Si hay un escáner activo, limpiar y ocultar modal
+      if (currentScanner) {
+        currentScanner.clear().then(() => {
+          document.getElementById("scannerModal").style.display = "none";
+        });
+      }
+      // Mostrar modal escáner
+      const scannerModal = document.getElementById("scannerModal");
+      scannerModal.style.display = "flex";
+      scannerModal.dataset.inputId = inputId; // guardo para usar después
+
+      const scannerDiv = document.getElementById("scanner");
+      scannerDiv.innerHTML = ""; // limpiar contenido
+
+      currentScanner = new Html5Qrcode("scanner");
+
+      currentScanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 280, height: 280 }
+        },
+        qrCodeMessage => {
+          // Al detectar QR, lo asigno al input correspondiente
+          document.getElementById(inputId).value = qrCodeMessage;
+          stopScanner();
+        },
+        errorMessage => {
+          // console.log("Error de escaneo:", errorMessage);
+        }
+      ).catch(err => {
+        alert("No se pudo acceder a la cámara");
+        stopScanner();
+      });
+    }
+
+    function stopScanner() {
+      if (currentScanner) {
+        currentScanner.stop().then(() => {
+          currentScanner.clear();
+          currentScanner = null;
+          document.getElementById("scannerModal").style.display = "none";
+        }).catch((e) => {
+          console.error("Error deteniendo el escáner:", e);
+        });
+      } else {
+        document.getElementById("scannerModal").style.display = "none";
+      }
+    }
+
+    // Botón cerrar modal
+    document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
+
+    // Cargar préstamos guardados desde Google Sheets al cargar la página
+    async function cargarPrestamosDesdeSheets() {
+      try {
+        const response = await fetch(SHEETS_WEBHOOK_URL);
+        if (!response.ok) throw new Error("Error al cargar datos");
+        const data = await response.json();
+        prestamos = data;
+        actualizarTabla();
+      } catch (error) {
+        console.error("No se pudieron cargar los préstamos:", error);
+      }
+    }
+
+    window.onload = () => {
+      cargarPrestamosDesdeSheets();
+    };
   </script>
  </body>
 </html>
