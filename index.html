@@ -55,13 +55,31 @@
       font-size: 1em;
     }
     #qr-reader {
-      width: 100%;
-      max-width: 320px;
+      width: 320px;
+      height: 320px;
       margin: 20px auto;
       display: none;
-      background: white;
-      padding: 10px;
+      background-color: black;
       border-radius: 10px;
+      position: relative;
+    }
+    #qr-reader video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    #stopScanBtn {
+      display: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      background: #e57373;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin: 10px auto 30px auto;
+      display: block;
+      max-width: 320px;
     }
     h2 {
       margin-top: 40px;
@@ -109,6 +127,7 @@
   </div>
 
   <div id="qr-reader"></div>
+  <button id="stopScanBtn" onclick="stopScan()">✖ Detener escaneo</button>
 
   <h2>📋 Préstamos Registrados</h2>
   <table id="prestamosTable">
@@ -127,10 +146,14 @@
     let html5QrCode;
     let currentInput = "";
 
+    const qrReader = document.getElementById("qr-reader");
+    const stopScanBtn = document.getElementById("stopScanBtn");
+
     function startScan(inputId) {
       currentInput = inputId;
-      const qrReader = document.getElementById("qr-reader");
       qrReader.style.display = "block";
+      stopScanBtn.style.display = "block";
+
       qrReader.innerHTML = "";
 
       if (html5QrCode) {
@@ -138,6 +161,7 @@
       }
 
       html5QrCode = new Html5Qrcode("qr-reader");
+
       Html5Qrcode.getCameras().then(devices => {
         if (devices && devices.length) {
           html5QrCode.start(
@@ -145,20 +169,33 @@
             { fps: 10, qrbox: 250 },
             qrCodeMessage => {
               document.getElementById(currentInput).value = qrCodeMessage;
-              html5QrCode.stop().then(() => {
-                qrReader.style.display = "none";
-                qrReader.innerHTML = "";
-                if (allFieldsFilled()) registrarPrestamo();
-              });
+              stopScan();
+              if (allFieldsFilled()) registrarPrestamo();
             },
-            error => {}
+            error => {
+              // console.log('Error en escaneo:', error);
+            }
           ).catch(err => {
             qrReader.innerHTML = "<p style='color:red;'>Error al iniciar la cámara.</p>";
+            stopScanBtn.style.display = "none";
           });
         } else {
           qrReader.innerHTML = "<p style='color:red;'>No se encontró una cámara disponible.</p>";
+          stopScanBtn.style.display = "none";
         }
       });
+    }
+
+    function stopScan() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          qrReader.style.display = "none";
+          qrReader.innerHTML = "";
+          stopScanBtn.style.display = "none";
+        }).catch(err => {
+          console.error("Error al detener la cámara", err);
+        });
+      }
     }
 
     function allFieldsFilled() {
@@ -179,14 +216,17 @@
         method: "POST",
         body: JSON.stringify({ responsable, alumno, libro, fecha }),
         headers: { "Content-Type": "application/json" }
-      }).then(response => response.json()).then(data => {
+      })
+      .then(response => response.json())
+      .then(data => {
         if (data.status === "ok") {
           agregarAFila(responsable, alumno, libro, fecha);
           limpiarCampos();
         } else {
           alert("Error al guardar en la hoja de cálculo");
         }
-      }).catch(error => {
+      })
+      .catch(error => {
         alert("Error de conexión con Google Sheets");
         console.error(error);
       });
