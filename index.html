@@ -1,168 +1,371 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca Escolar</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biblioteca Primaria Colegio San Pablo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      padding-bottom: 100px;
+      font-family: 'Jost', sans-serif;
+      background-color: #fff;
+      color: #333;
+      padding: 20px;
+      text-align: center;
+    }
+    #top-image {
+      display: block;
+      margin: 0 auto 25px auto;
+      max-height: 250px;
+      width: auto;
     }
     h1 {
-      text-align: center;
-      color: #4a4a4a;
+      font-size: 2.5em;
+      color: #4a4e69;
+      margin-bottom: 0.3em;
+      margin-top: 0.1em;
     }
-    .scanner-container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      z-index: 1000;
+    #scannerModal {
       display: none;
-    }
-    .overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.5);
-      z-index: 999;
-      display: none;
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    #scanner {
+      width: 320px;
+      height: 320px;
+      border-radius: 20px;
+      background-color: #f2e9e4;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    #scanner video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      border-radius: 20px;
+    }
+    #closeScannerBtn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e57373;
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      z-index: 1100;
+      line-height: 0;
+      padding: 0;
+    }
+    button {
+      background-color: #a3c4f3;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #87b2f2;
     }
     table {
-      width: 100%;
+      margin: 20px auto;
       border-collapse: collapse;
-      margin-top: 20px;
+      width: 90%;
+      max-width: 600px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      border: 1px solid #ddd;
+      padding: 10px;
       text-align: center;
     }
     th {
-      background-color: #f2f2f2;
+      background-color: #c9daf8;
+      color: #333;
     }
-    button {
+    td {
+      background-color: #fefefe;
+    }
+    input[type="text"] {
       padding: 10px;
-      margin: 5px;
+      width: 80%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    #resultadosBusqueda {
+      margin: 30px auto;
+      max-width: 650px;
+      text-align: left;
+    }
+    .search-label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+      margin-top: 18px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .search-box {
+      margin-bottom: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      body {
+        padding: 8px;
+      }
+      #top-image {
+        max-width: 90vw;
+        max-height: 140px;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      table {
+        font-size: 0.95em;
+        width: 100%;
+        max-width: 100vw;
+      }
+      input[type="text"] {
+        width: 95vw;
+        max-width: 98vw;
+        font-size: 1em;
+      }
+      .search-label {
+        max-width: 95vw;
+      }
+      button {
+        width: 90vw;
+        max-width: 95vw;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #scanner {
+        width: 90vw !important;
+        height: 90vw !important;
+        border-radius: 12px;
+      }
+      #scannerModal {
+        align-items: flex-start;
+        padding-top: 60px;
+      }
     }
   </style>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-  <h1>Registro de Préstamos - Biblioteca Escolar</h1>
+  <img id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png" alt="Escudo Colegio San Pablo" />
+  <h1>📚 Biblioteca Primaria Colegio San Pablo</h1>
+  <p style="font-size:1em; color:#666; margin-bottom:14px;">
+    Si estás usando un celular, acepta el permiso de cámara para escanear códigos QR.
+  </p>
+  <p style="font-size: 1.3em; max-width: 98%; margin: 5px auto; line-height: 1.6;">
+    Escaneá primero el código QR del <strong>responsable</strong>, luego del <strong>alumno</strong> y por último del <strong>libro</strong> para registrar un préstamo.
+    <br/>
+    También podés buscar libros y ver qué alumnos los tomaron, o buscar alumnos para ver qué libros tienen en préstamo.
+  </p>
 
-  <label>Responsable:</label>
-  <input type="text" id="responsableInput" placeholder="Nombre del responsable" />
-  <br><br>
-  <button onclick="abrirScanner('libro')">Escanear Libro</button>
-  <input type="text" id="libroInput" placeholder="Código del libro" readonly />
-  <br><br>
-  <button onclick="abrirScanner('alumno')">Escanear Alumno</button>
-  <input type="text" id="alumnoInput" placeholder="Código del alumno" readonly />
-  <br><br>
-  <button onclick="registrarPrestamo()">Registrar Préstamo</button>
+  <div>
+    <input id="responsableInput" placeholder="Escaneá el QR del responsable" readonly type="text" />
+    <button onclick="startScanner('responsableInput')">📷</button>
 
-  <div class="overlay" id="overlay" onclick="cerrarScanner()"></div>
-  <div class="scanner-container" id="scannerContainer">
-    <div id="reader" style="width: 300px;"></div>
-    <button onclick="cerrarScanner()">Cerrar</button>
+    <input id="alumnoInput" placeholder="Escaneá el QR del alumno" readonly type="text" />
+    <button onclick="startScanner('alumnoInput')">📷</button>
+
+    <input id="libroInput" placeholder="Escaneá el QR del libro" readonly type="text" />
+    <button onclick="startScanner('libroInput')">📷</button>
+
+    <button onclick="registrarPrestamo()" style="background-color:#4a4e69;">Registrar Préstamo</button>
   </div>
 
-  <h2>Préstamos Registrados Hoy</h2>
-  <table id="prestamosTable">
+  <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">📋 Préstamos Registrados</h2>
+  <table>
     <thead>
       <tr>
         <th>Responsable</th>
-        <th>Alumno</th>
         <th>Libro</th>
+        <th>Alumno</th>
         <th>Fecha</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="prestamosTable"></tbody>
   </table>
 
+  <div class="search-box">
+    <h3>🔍 Buscar información</h3>
+    <label class="search-label" for="buscarLibro">Buscar por libro</label>
+    <input id="buscarLibro" placeholder="Ej: LIB001 o título" type="text" />
+    <button onclick="startScanner('buscarLibro')">📷</button>
+    <button onclick="buscarPorLibro()">Buscar</button>
+
+    <label class="search-label" for="buscarAlumno">Buscar por alumno</label>
+    <input id="buscarAlumno" placeholder="Ej: ALU001 o nombre" type="text" />
+    <button onclick="startScanner('buscarAlumno')">📷</button>
+    <button onclick="buscarPorAlumno()">Buscar</button>
+  </div>
+  <div id="resultadosBusqueda"></div>
+
+  <!-- Modal del escáner -->
+  <div id="scannerModal">
+    <div id="scanner"></div>
+    <button id="closeScannerBtn" title="Cerrar escáner">×</button>
+  </div>
+
   <script>
+    // Cambia esta URL por la URL desplegada de tu Google Apps Script (modo Web App)
     const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwg-f66hkw2TIOCcIVxLQeawhze-fooBcHjEGyl2X6ghSZxUspo9yBpCFZP7jvew0VLuA/exec";
-    let scannerActivo = null;
-    let inputActivo = null;
-    const prestamos = [];
 
-    function abrirScanner(campo) {
-      inputActivo = campo;
-      document.getElementById('overlay').style.display = 'block';
-      document.getElementById('scannerContainer').style.display = 'block';
+    let prestamos = [];
+    let currentScanner = null;
 
-      scannerActivo = new Html5Qrcode("reader");
-      scannerActivo.start({ facingMode: "environment" }, {
-        fps: 10,
-        qrbox: 250
-      }, qrCodeMessage => {
-        if (inputActivo === 'libro') {
-          document.getElementById('libroInput').value = qrCodeMessage;
-        } else {
-          document.getElementById('alumnoInput').value = qrCodeMessage;
+    function startScanner(inputId) {
+      if (currentScanner) {
+        currentScanner.clear().then(() => {
+          document.getElementById("scannerModal").style.display = "none";
+          currentScanner = null;
+          iniciarEscaneo(inputId);
+        });
+        return;
+      }
+      iniciarEscaneo(inputId);
+    }
+
+    function iniciarEscaneo(inputId) {
+      const scannerModal = document.getElementById("scannerModal");
+      const scannerDiv = document.getElementById("scanner");
+      scannerDiv.innerHTML = ""; // limpio
+      scannerModal.style.display = "flex";
+
+      currentScanner = new Html5Qrcode("scanner");
+      currentScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 280 },
+        (decodedText) => {
+          document.getElementById(inputId).value = decodedText;
+          stopScanner();
+        },
+        (errorMessage) => {
+          // console.log("Error de escaneo:", errorMessage);
         }
-        cerrarScanner();
-      }).catch(err => {
-        alert("Error al iniciar la cámara: " + err);
-        cerrarScanner();
+      ).catch((err) => {
+        alert("No se pudo acceder a la cámara. Verificá los permisos.");
+        stopScanner();
       });
     }
 
-    function cerrarScanner() {
-      if (scannerActivo) {
-        scannerActivo.stop().then(() => {
-          scannerActivo.clear();
-          scannerActivo = null;
+    function stopScanner() {
+      if (currentScanner) {
+        currentScanner.stop().then(() => {
+          currentScanner.clear();
+          currentScanner = null;
+          document.getElementById("scannerModal").style.display = "none";
+        }).catch((e) => {
+          console.error("Error deteniendo el escáner:", e);
         });
+      } else {
+        document.getElementById("scannerModal").style.display = "none";
       }
-      document.getElementById('overlay').style.display = 'none';
-      document.getElementById('scannerContainer').style.display = 'none';
     }
 
+    document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
+
     function registrarPrestamo() {
-      const responsable = document.getElementById('responsableInput').value.trim();
-      const libro = document.getElementById('libroInput').value.trim();
-      const alumno = document.getElementById('alumnoInput').value.trim();
+      const responsable = document.getElementById("responsableInput").value.trim();
+      const libro = document.getElementById("libroInput").value.trim();
+      const alumno = document.getElementById("alumnoInput").value.trim();
+
       if (!responsable || !libro || !alumno) {
-        alert("Escaneá primero el libro y el alumno");
+        alert("Escaneá primero el responsable, el alumno y el libro.");
         return;
       }
+
       const fecha = new Date().toLocaleString();
       prestamos.push({ responsable, libro, alumno, fecha });
-      actualizarTabla();
-      document.getElementById('libroInput').value = "";
-      document.getElementById('alumnoInput').value = "";
 
+      actualizarTabla();
+
+      document.getElementById("libroInput").value = "";
+      document.getElementById("alumnoInput").value = "";
+
+      // Enviar a Google Sheets
       fetch(SHEETS_WEBHOOK_URL, {
-        method: 'POST',
-        mode: 'no-cors',
+        method: "POST",
+        mode: "no-cors",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ responsable, libro, alumno, fecha })
+        body: JSON.stringify({ responsable, libro, alumno, fecha }),
       });
 
       alert("¡Préstamo registrado!");
     }
 
     function actualizarTabla() {
-      const hoy = new Date().toLocaleDateString();
-      const tbody = document.querySelector("#prestamosTable tbody");
-      tbody.innerHTML = "";
-      prestamos.forEach(p => {
-        if (new Date(p.fecha).toLocaleDateString() === hoy) {
-          const fila = `<tr><td>${p.responsable}</td><td>${p.alumno}</td><td>${p.libro}</td><td>${p.fecha}</td></tr>`;
-          tbody.innerHTML += fila;
-        }
+      const tabla = document.getElementById("prestamosTable");
+      tabla.innerHTML = "";
+      prestamos.forEach((p) => {
+        const fila = tabla.insertRow();
+        fila.insertCell(0).textContent = p.responsable;
+        fila.insertCell(1).textContent = p.libro;
+        fila.insertCell(2).textContent = p.alumno;
+        fila.insertCell(3).textContent = p.fecha;
       });
+    }
+
+    function buscarPorLibro() {
+      const consulta = document.getElementById("buscarLibro").value.toLowerCase();
+      const resultados = prestamos.filter((p) =>
+        p.libro.toLowerCase().includes(consulta)
+      );
+      mostrarResultados("Libro", consulta, resultados);
+    }
+
+    function buscarPorAlumno() {
+      const consulta = document.getElementById("buscarAlumno").value.toLowerCase();
+      const resultados = prestamos.filter((p) =>
+        p.alumno.toLowerCase().includes(consulta)
+      );
+      mostrarResultados("Alumno", consulta, resultados);
+    }
+
+    function mostrarResultados(tipo, consulta, resultados) {
+      const contenedor = document.getElementById("resultadosBusqueda");
+      if (!consulta) {
+        contenedor.innerHTML = "";
+        return;
+      }
+      if (resultados.length === 0) {
+        contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
+        return;
+      }
+      let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
+      resultados.forEach((p) => {
+        html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
+      });
+      html += "</ul>";
+      contenedor.innerHTML = html;
     }
   </script>
 </body>
