@@ -285,6 +285,32 @@
     console.log("Modal visible");
   }, 3000);
 };
+   <script>
+  // ... tu código actual ...
+
+  async function cargarPrestamosDesdeSheets() {
+    try {
+      const response = await fetch(SHEETS_WEBHOOK_URL);
+      if (!response.ok) throw new Error("Error al cargar datos");
+      const data = await response.json();
+      prestamos = data;
+      actualizarTabla();
+    } catch (error) {
+      console.error("No se pudieron cargar los préstamos:", error);
+    }
+  }
+
+  window.onload = () => {
+    cargarPrestamosDesdeSheets();
+
+    setTimeout(() => {
+      document.getElementById("scannerModal").style.display = "flex";
+      console.log("Modal visible");
+    }, 3000);
+  };
+// ... resto del código ...
+</script>
+
   </script>
  </body>
 </html>
