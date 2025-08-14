@@ -28,14 +28,45 @@
       margin-bottom: 0.3em;
       margin-top: 0.1em;
     }
+    /* Contenedor modal para el scanner */
+    #scannerModal {
+      display: none; /* oculto por defecto */
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
     #scanner {
-      margin: 20px auto;
-      width: 300px;
-      height: 300px;
-      border: 2px dashed #b8bedd;
+      width: 320px;
+      height: 320px;
       border-radius: 20px;
       background-color: #f2e9e4;
-      display: none;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    #scanner video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      border-radius: 20px;
+    }
+    #closeScannerBtn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e57373;
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      z-index: 1100;
+      line-height: 0;
+      padding: 0;
     }
     button {
       background-color: #a3c4f3;
@@ -135,10 +166,18 @@
         margin-left: auto;
         margin-right: auto;
       }
+      #scanner {
+        width: 90vw !important;
+        height: 90vw !important;
+        border-radius: 12px;
+      }
+      #scannerModal {
+        align-items: flex-start;
+        padding-top: 60px;
+      }
     }
   </style>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript">
-  </script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
  </head>
  <body>
   <!-- Imagen escudo en el encabezado -->
@@ -179,6 +218,7 @@
     Registrar Pr&eacute;stamo
    </button>
   </div>
+
   <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">
    📋 Pr&eacute;stamos Registrados
   </h2>
@@ -202,6 +242,7 @@
    <tbody id="prestamosTable">
    </tbody>
   </table>
+
   <div class="search-box">
    <h3>
     🔍 Buscar informaci&oacute;n
@@ -229,8 +270,13 @@
   </div>
   <div id="resultadosBusqueda">
   </div>
-  <div id="scanner">
+
+  <!-- Modal con el escáner -->
+  <div id="scannerModal">
+    <div id="scanner"></div>
+    <button id="closeScannerBtn" title="Cerrar escáner">×</button>
   </div>
+
   <script>
    // Cambia esto por la URL de tu Apps Script de Google Sheets
     const SHEETS_WEBHOOK_URL = 'https://script.google.com/a/macros/csanpablo.edu.ar/s/AKfycbzKJIK4JePISCjucpyks97_Gz1JpaGW6E8FK922PXX-CbAeYk8IWIhHpJABGIubSLvTLA/exec';
@@ -306,41 +352,62 @@
       contenedor.innerHTML = html;
     }
 
-    // QR usando Html5Qrcode
+    // Variables para el escáner QR
     let currentScanner = null;
+
     function startScanner(inputId) {
+      // Si hay un escáner activo, limpiar y ocultar modal
       if (currentScanner) {
         currentScanner.clear().then(() => {
-          document.getElementById("scanner").style.display = "none";
+          document.getElementById("scannerModal").style.display = "none";
         });
       }
+      // Mostrar modal escáner
+      const scannerModal = document.getElementById("scannerModal");
+      scannerModal.style.display = "flex";
+      scannerModal.dataset.inputId = inputId; // guardo para usar después
+
       const scannerDiv = document.getElementById("scanner");
-      scannerDiv.style.display = "block";
-      scannerDiv.innerHTML = "";
+      scannerDiv.innerHTML = ""; // limpiar contenido
+
       currentScanner = new Html5Qrcode("scanner");
+
       currentScanner.start(
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: 250
+          qrbox: { width: 280, height: 280 }
         },
         qrCodeMessage => {
+          // Al detectar QR, lo asigno al input correspondiente
           document.getElementById(inputId).value = qrCodeMessage;
-          currentScanner.stop().then(() => {
-            scannerDiv.style.display = "none";
-            scannerDiv.innerHTML = "";
-            currentScanner = null;
-          });
+          stopScanner();
         },
         errorMessage => {
-          // Silencia errores de lectura
+          // console.log("Error de escaneo:", errorMessage);
         }
       ).catch(err => {
         alert("No se pudo acceder a la cámara");
-        scannerDiv.style.display = "none";
-        currentScanner = null;
+        stopScanner();
       });
     }
+
+    function stopScanner() {
+      if (currentScanner) {
+        currentScanner.stop().then(() => {
+          currentScanner.clear();
+          currentScanner = null;
+          document.getElementById("scannerModal").style.display = "none";
+        }).catch((e) => {
+          console.error("Error deteniendo el escáner:", e);
+        });
+      } else {
+        document.getElementById("scannerModal").style.display = "none";
+      }
+    }
+
+    // Botón cerrar modal
+    document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
   </script>
  </body>
 </html>
