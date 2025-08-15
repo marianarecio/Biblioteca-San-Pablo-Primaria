@@ -244,30 +244,15 @@
   </table>
 
   <div class="search-box">
-   <h3>
-    🔍 Buscar informaci&oacute;n
-   </h3>
-   <label class="search-label" for="buscarLibro">
-    Buscar por libro
-   </label>
-   <input id="buscarLibro" placeholder="Ej: LIB001 o t&iacute;tulo" type="text"/>
-   <button onclick="startScanner('buscarLibro')">
-    📷
-   </button>
-   <button onclick="buscarPorLibro()">
-    Buscar
-   </button>
-   <label class="search-label" for="buscarAlumno">
-    Buscar por alumno
-   </label>
-   <input id="buscarAlumno" placeholder="Ej: ALU001 o nombre" type="text"/>
-   <button onclick="startScanner('buscarAlumno')">
-    📷
-   </button>
-   <button onclick="buscarPorAlumno()">
-    Buscar
-   </button>
+    <h3>🔍 Buscar información</h3>
+    <label class="search-label" for="buscarGeneral">
+      Buscar por alumno o libro
+    </label>
+    <input id="buscarGeneral" placeholder="Ej: Juan o LIB001" type="text"/>
+    <button onclick="startScanner('buscarGeneral')">📷</button>
+    <button onclick="buscarGeneral()">Buscar</button>
   </div>
+
   <div id="resultadosBusqueda">
   </div>
 
@@ -354,16 +339,19 @@
     });
   }
 
-  function buscarPorLibro() {
-    const consulta = document.getElementById("buscarLibro").value.toLowerCase();
-    const resultados = prestamos.filter(p => p.libro.toLowerCase().includes(consulta));
-    mostrarResultados("Libro", consulta, resultados);
-  }
+  function buscarGeneral() {
+    const consulta = document.getElementById("buscarGeneral").value.toLowerCase().trim();
+    if (!consulta) {
+      document.getElementById("resultadosBusqueda").innerHTML = "";
+      return;
+    }
 
-  function buscarPorAlumno() {
-    const consulta = document.getElementById("buscarAlumno").value.toLowerCase();
-    const resultados = prestamos.filter(p => p.alumno.toLowerCase().includes(consulta));
-    mostrarResultados("Alumno", consulta, resultados);
+    const resultados = prestamos.filter(p =>
+      p.libro.toLowerCase().includes(consulta) ||
+      p.alumno.toLowerCase().includes(consulta)
+    );
+
+    mostrarResultados("Alumno o Libro", consulta, resultados);
   }
 
   function mostrarResultados(tipo, consulta, resultados) {
