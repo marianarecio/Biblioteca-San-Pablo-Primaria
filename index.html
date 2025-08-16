@@ -111,7 +111,7 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
-      cursor: pointer; /* Para indicar que se puede clicar */
+      cursor: pointer;
     }
     #resultadosBusqueda {
       margin: 30px auto;
@@ -215,10 +215,7 @@
   <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
 </div>
   <div>
-   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly="" type="text"/>
-   <button id="btnResponsableScan" onclick="startScanner('responsableInput')">
-    📷
-   </button>
+   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly type="text" onclick="startScanner('responsableInput')"/>
   </div>
   <div>
    <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly type="text" onclick="startScanner('alumnoInput')"/>
@@ -318,8 +315,7 @@
       // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
       document.getElementById("responsableInput").setAttribute("readonly", true);
       // También desactivo el botón de escaneo del responsable
-      document.getElementById("btnResponsableScan").disabled = true;
-      document.getElementById("btnResponsableScan").style.opacity = 0.5;
+      // Ya no hay botón, por eso no hace falta desactivar
     }
   }
 
@@ -426,12 +422,9 @@
         if(inputId === "responsableInput") {
           responsableActual = qrCodeMessage;
           sessionStorage.setItem("responsableActual", responsableActual);
-          // Bloqueo input y botón responsable
+          // Bloqueo input responsable para evitar cambios hasta recarga
           const respInput = document.getElementById("responsableInput");
           respInput.setAttribute("readonly", true);
-          const btnResp = document.getElementById("btnResponsableScan");
-          btnResp.disabled = true;
-          btnResp.style.opacity = 0.5;
         }
 
         stopScanner();
