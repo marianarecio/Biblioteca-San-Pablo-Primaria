@@ -281,51 +281,29 @@
   </div>
 
 <script>
+  let responsableActual = localStorage.getItem("responsable") || "";
+  let prestamos = JSON.parse(localStorage.getItem("prestamos")) || [];
+  let prestamosSesion = [];
+
   const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
 
-  let prestamos = [];         
-  let prestamosSesion = [];   
-  let responsableActual = null;  // Guardo el responsable escaneado para la sesión
+  function iniciarScanner(campoId) {
+    const html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: 250 };
 
-  async function cargarPrestamosDesdeSheets() {
-    try {
-      const response = await fetch(SHEETS_WEBHOOK_URL);
-      if (!response.ok) throw new Error("Error al cargar datos");
-      const data = await response.json();
-      prestamos = data.map(item => ({
-        responsable: item.Responsable,
-        alumno: item.Alumno,
-        libro: item.Libro,
-        fecha: item.Fecha,
-      }));
-    } catch (error) {
-      console.error("No se pudieron cargar los préstamos:", error);
-    }
-  }
-
-  function guardarSesion() {
-    sessionStorage.setItem("prestamosSesion", JSON.stringify(prestamosSesion));
-    if(responsableActual) {
-      sessionStorage.setItem("responsableActual", responsableActual);
-    }
-  }
-
-  function cargarSesion() {
-    const datosGuardados = sessionStorage.getItem("prestamosSesion");
-    if (datosGuardados) {
-      prestamosSesion = JSON.parse(datosGuardados);
-      actualizarTabla();
-    }
-    const responsableGuardado = sessionStorage.getItem("responsableActual");
-    if(responsableGuardado) {
-      responsableActual = responsableGuardado;
-      document.getElementById("responsableInput").value = responsableActual;
-      // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
-      document.getElementById("responsableInput").setAttribute("readonly", true);
-      // También desactivo el botón de escaneo del responsable
-      document.getElementById("btnResponsableScan").disabled = true;
-      document.getElementById("btnResponsableScan").style.opacity = 0.5;
-    }
+    html5QrCode.start(
+      { facingMode: "environment" },
+      config,
+      (decodedText, decodedResult) => {
+        document.getElementById(campoId).value = decodedText;
+        html5QrCode.stop().then(() => {
+          document.getElementById("reader").innerHTML = "";
+        }).catch((err) => console.error("Error al detener el escáner:", err));
+      },
+      (errorMessage) => {
+        // Ignorar errores de escaneo por ahora
+      }
+    ).catch((err) => console.error("Error al iniciar el escáner:", err));
   }
 
   function registrarPrestamo() {
@@ -339,8 +317,9 @@
       alert("Escaneá primero el código QR del alumno y del libro");
       return;
     }
-   const ahora = new Date();
-const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+
     const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
 
     prestamosSesion.push(nuevoPrestamo);
@@ -363,123 +342,84 @@ const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString
     alert("¡Préstamo registrado!");
   }
 
-  function actualizarTabla() {
-    const tabla = document.getElementById("prestamosTable");
-    tabla.innerHTML = "";
-    prestamosSesion.forEach(p => {
-      const fila = tabla.insertRow();
-      fila.insertCell(0).textContent = p.responsable;
-      fila.insertCell(1).textContent = p.libro;
-      fila.insertCell(2).textContent = p.alumno;
-      fila.insertCell(3).textContent = p.fecha;
-    });
-  }
-
   function buscar() {
-    const consulta = document.getElementById("busqueda").value.toLowerCase().trim();
-    if (!consulta) {
-      document.getElementById("resultadosBusqueda").innerHTML = "";
-      return;
-    }
+    const busqueda = document.getElementById("busqueda").value.toLowerCase();
     const resultados = prestamos.filter(p =>
-      p.libro.toLowerCase().includes(consulta) || p.alumno.toLowerCase().includes(consulta)
+      p.alumno.toLowerCase().includes(busqueda) ||
+      p.libro.toLowerCase().includes(busqueda)
     );
-    mostrarResultados("Búsqueda", consulta, resultados);
-  }
 
-  function mostrarResultados(tipo, consulta, resultados) {
-    const contenedor = document.getElementById("resultadosBusqueda");
-    if (resultados.length === 0) {
-      contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
-      return;
-    }
-    let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
+    const tabla = document.getElementById("tablaResultados");
+    tabla.innerHTML = `
+      <tr>
+        <th>Responsable</th>
+        <th>Alumno</th>
+        <th>Libro</th>
+        <th>Fecha</th>
+      </tr>
+    `;
+
     resultados.forEach(p => {
-      html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
-    });
-    html += "</ul>";
-    contenedor.innerHTML = html;
-  }
-
-  // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
-  let currentScanner = null;
-  function startScanner(inputId) {
-    if (currentScanner) {
-      currentScanner.clear().then(() => {
-        document.getElementById("scannerModal").style.display = "none";
-      });
-    }
-    const scannerModal = document.getElementById("scannerModal");
-    scannerModal.style.display = "flex";
-    scannerModal.dataset.inputId = inputId;
-
-    const scannerDiv = document.getElementById("scanner");
-    scannerDiv.innerHTML = "";
-
-    currentScanner = new Html5Qrcode("scanner");
-
-    currentScanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 280, height: 280 }
-      },
-      qrCodeMessage => {
-        document.getElementById(inputId).value = qrCodeMessage;
-
-        // Actualizo responsableActual si es responsableInput
-        if(inputId === "responsableInput") {
-          responsableActual = qrCodeMessage;
-          sessionStorage.setItem("responsableActual", responsableActual);
-          // Bloqueo input y botón responsable
-          const respInput = document.getElementById("responsableInput");
-          respInput.setAttribute("readonly", true);
-          const btnResp = document.getElementById("btnResponsableScan");
-          btnResp.disabled = true;
-          btnResp.style.opacity = 0.5;
-        }
-
-        stopScanner();
-
-        // Si escaneamos el alumno, abrimos automáticamente escáner del libro
-        if(inputId === "alumnoInput") {
-          setTimeout(() => {
-            startScanner("libroInput");
-          }, 1000);  // 1 segundos de espera antes de abrir escáner del libro
-        }
-      },
-      errorMessage => {}
-    ).catch(err => {
-      alert("No se pudo acceder a la cámara");
-      stopScanner();
+      const fila = tabla.insertRow(-1);
+      fila.innerHTML = `
+        <td>${p.responsable}</td>
+        <td>${p.alumno}</td>
+        <td>${p.libro}</td>
+        <td>${p.fecha}</td>
+      `;
     });
   }
 
-  function stopScanner() {
-    if (currentScanner) {
-      currentScanner.stop().then(() => {
-        currentScanner.clear();
-        currentScanner = null;
-        document.getElementById("scannerModal").style.display = "none";
-      }).catch((e) => {
-        console.error("Error deteniendo el escáner:", e);
-      });
-    } else {
-      document.getElementById("scannerModal").style.display = "none";
+  function guardarSesion() {
+    localStorage.setItem("responsable", responsableActual);
+    localStorage.setItem("prestamos", JSON.stringify(prestamos));
+  }
+
+  function actualizarTabla() {
+    const tabla = document.getElementById("tablaPrestamos");
+    tabla.innerHTML = `
+      <tr>
+        <th>Responsable</th>
+        <th>Alumno</th>
+        <th>Libro</th>
+        <th>Fecha</th>
+      </tr>
+    `;
+    prestamosSesion.forEach(p => {
+      const fila = tabla.insertRow(-1);
+      fila.innerHTML = `
+        <td>${p.responsable}</td>
+        <td>${p.alumno}</td>
+        <td>${p.libro}</td>
+        <td>${p.fecha}</td>
+      `;
+    });
+  }
+
+  window.onload = function () {
+    if (responsableActual) {
+      document.getElementById("nombreResponsable").textContent = responsableActual;
     }
-  }
 
-  document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
-document.getElementById("busqueda").addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
-    buscar();
-  }
-});
+    // Escáner con Enter en búsqueda
+    document.getElementById("busqueda").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        buscar();
+      }
+    });
 
-  window.onload = () => {
-    cargarSesion();
-    cargarPrestamosDesdeSheets();
-  };
+    // Activar escáner al hacer clic en el input de Alumno
+    document.getElementById("alumnoInput").addEventListener("click", function() {
+      iniciarScanner('alumnoInput');
+    });
+
+    // Activar escáner al hacer clic en el input de Libro
+    document.getElementById("libroInput").addEventListener("click", function() {
+      iniciarScanner('libroInput');
+    });
+
+    actualizarTabla();
+  }
 </script>
 
  </body>
