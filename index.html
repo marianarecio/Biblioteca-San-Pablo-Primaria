@@ -402,7 +402,6 @@
     const scannerModal = document.getElementById("scannerModal");
     const scannerDiv = document.getElementById("scanner");
 
-    // Mostrar modal y texto de carga con fondo blanco semitransparente
     scannerModal.style.display = "flex";
     scannerModal.dataset.inputId = inputId;
 
@@ -411,14 +410,15 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.8);
-      padding: 10px 20px;
-      border-radius: 10px;
-      color: #555;
-      font-weight: bold;
-      font-size: 1.2em;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 24px;
+      border-radius: 12px;
+      color: #004080;
+      font-weight: 700;
+      font-size: 1.3em;
       user-select: none;
       z-index: 2000;
+      box-shadow: 0 0 6px rgba(0, 64, 128, 0.7);
     ">Cargando cámara...</div>`;
 
     if (currentScanner) {
@@ -464,7 +464,6 @@
         },
         errorMessage => {}
       ).then(() => {
-        // Cámara lista: ocultar texto de carga
         const loadingText = document.getElementById("loadingText");
         if(loadingText) loadingText.style.display = "none";
       }).catch(err => {
