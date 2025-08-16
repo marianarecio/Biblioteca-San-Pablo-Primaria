@@ -1,474 +1,193 @@
 <!DOCTYPE html>
 <html lang="es">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>
-   Biblioteca Primaria Colegio San Pablo
-  </title>
-  <!-- Fuente Jost -->
-  <link href="https://fonts.googleapis.com/css2?family=Jost&amp;display=swap" rel="stylesheet"/>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biblioteca - Colegio San Pablo</title>
   <style>
-   body {
-      font-family: 'Jost', sans-serif;
-      background-color: #fff;
-      color: #333;
-      padding: 20px;
+    body {
+      font-family: Arial, sans-serif;
       text-align: center;
+      padding: 20px;
     }
-    #top-image {
-      display: block;
-      margin: 0 auto 25px auto;
-      max-height: 250px;
-      width: auto;
-    }
-    h1 {
-      font-size: 2.5em;
-      color: #4a4e69;
-      margin-bottom: 0.3em;
-      margin-top: 0.1em;
-    }
-    /* Contenedor modal para el scanner */
-    #scannerModal {
-      display: none; /* oculto por defecto */
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    #scanner {
-      width: 320px;
-      height: 320px;
-      border-radius: 20px;
-      background-color: #f2e9e4;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      position: relative;
-    }
-    #scanner video {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover;
-      border-radius: 20px;
-    }
-    #closeScannerBtn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #e57373;
-      border: none;
-      color: white;
-      font-size: 18px;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      z-index: 1100;
-      line-height: 0;
-      padding: 0;
-    }
-    button {
-      background-color: #a3c4f3;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      margin: 10px;
+    input, button {
+      padding: 10px;
+      margin: 5px;
       font-size: 16px;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #87b2f2;
     }
     table {
-      margin: 20px auto;
+      width: 100%;
+      margin-top: 20px;
       border-collapse: collapse;
-      width: 90%;
-      max-width: 600px;
-      background-color: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #c9daf8;
-      color: #333;
-    }
-    td {
-      background-color: #fefefe;
-    }
-    input[type="text"] {
-      padding: 10px;
-      width: 80%;
-      max-width: 400px;
-      margin-bottom: 20px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+      padding: 8px;
     }
-    #resultadosBusqueda {
+    #reader {
+      width: 300px;
+      margin: 10px auto;
+    }
+    .section {
       margin: 30px auto;
-      max-width: 650px;
-      text-align: left;
-    }
-    .search-label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 4px;
-      margin-top: 18px;
-      text-align: left;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .search-box {
-      margin-bottom: 18px;
-    }
-
-    /* --- Mejoras para móviles --- */
-    @media (max-width: 600px) {
-      body {
-        padding: 8px;
-      }
-      #top-image {
-        max-width: 90vw;
-        max-height: 140px;
-      }
-      h1 {
-        font-size: 1.5em;
-      }
-      table {
-        font-size: 0.95em;
-        width: 100%;
-        max-width: 100vw;
-      }
-      input[type="text"] {
-        width: 95vw;
-        max-width: 98vw;
-        font-size: 1em;
-      }
-      .search-label {
-        max-width: 95vw;
-      }
-      button {
-        width: 90vw;
-        max-width: 95vw;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        font-size: 1.1em;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      #scanner {
-        width: 90vw !important;
-        height: 90vw !important;
-        border-radius: 12px;
-      }
-      #scannerModal {
-        align-items: flex-start;
-        padding-top: 60px;
-      }
+      max-width: 500px;
     }
   </style>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
- </head>
- <body>
-  <!-- Imagen escudo en el encabezado -->
-  <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
-  <h1>
-   📚 Biblioteca Primaria Colegio San Pablo
-  </h1>
-  <p style="font-size:1em; color:#666; margin-bottom:14px;">
-   Si est&aacute;s usando un celular, acepta el permiso de c&aacute;mara para escanear c&oacute;digos QR.
-  </p>
-  <p style="font-size: 1.3em; max-width: 98%; margin: 5px auto; line-height: 1.6;">
-   Escane&aacute; primero el c&oacute;digo QR del
-   <strong>
-    responsable
-   </strong>
-   para iniciar sesión.
-   <br/>
-   Luego, escane&aacute; el c&oacute;digo QR del
-   <strong>
-    alumno
-   </strong>
-   y el del
-   <strong>
-    libro
-   </strong>
-   para registrar un pr&eacute;stamo.
-   <br/>
-   El código del responsable se mantendrá durante toda la sesión.
-  </p>
-  <div>
-   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly="" type="text"/>
-   <button id="btnResponsableScan" onclick="startScanner('responsableInput')">
-    📷
-   </button>
-  </div>
-  <div>
-   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly="" type="text"/>
-   <button id="btnAlumnoScan" onclick="startScanner('alumnoInput')">
-    📷
-   </button>
-  </div>
-  <div>
-   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
-   <button id="btnLibroScan" onclick="startScanner('libroInput')">
-    📷
-   </button>
-  </div>
-  <button id="registrarBtn" onclick="registrarPrestamo()" style="background-color:#4a4e69;">
-    Registrar Pr&eacute;stamo
-  </button>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
 
-  <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">
-   📋 Pr&eacute;stamos Registrados
-  </h2>
-  <table>
-   <thead>
-    <tr>
-     <th>
-      Responsable
-     </th>
-     <th>
-      Libro
-     </th>
-     <th>
-      Alumno
-     </th>
-     <th>
-      Fecha
-     </th>
-    </tr>
-   </thead>
-   <tbody id="prestamosTable">
-   </tbody>
-  </table>
+  <h1>Biblioteca - Colegio San Pablo</h1>
 
-  <div class="search-box">
-   <h3>
-    🔍 Buscar informaci&oacute;n
-   </h3>
-   <label class="search-label" for="busqueda">
-    Buscar por libro o alumno
-   </label>
-   <input id="busqueda" placeholder="Ej: LIB001, ALU001, título o nombre" type="text"/>
-   <button onclick="buscar()">
-    Buscar
-   </button>
-  </div>
-  <div id="resultadosBusqueda">
+  <div class="section" id="responsableSection">
+    <h3>Escanear código de la maestra</h3>
+    <button id="btnIniciarEscaneo" onclick="iniciarScanner()">Escanear Maestra</button>
+    <div id="reader" style="display: none;"></div>
   </div>
 
-  <!-- Modal con el escáner -->
-  <div id="scannerModal">
-    <div id="scanner"></div>
-    <button id="closeScannerBtn" title="Cerrar escáner">×</button>
+  <div class="section" id="registroSection" style="display: none;">
+    <h3>Registrar préstamo</h3>
+    <input type="text" id="alumno" placeholder="Alumno" readonly />
+    <input type="text" id="libro" placeholder="Libro" readonly />
+    <button onclick="resetear()">Cancelar</button>
+
+    <h3>Préstamos registrados en esta sesión</h3>
+    <table id="tablaPrestamos">
+      <thead>
+        <tr>
+          <th>Maestra</th>
+          <th>Alumno</th>
+          <th>Libro</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
-<script>
-  const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
+  <div class="section">
+    <h3>Buscar préstamo</h3>
+    <input type="text" id="busqueda" placeholder="Buscar por alumno o libro" onkeypress="if(event.key === 'Enter') buscarPrestamo()" />
+    <button onclick="buscarPrestamo()">Buscar</button>
+    <table id="tablaBusqueda">
+      <thead>
+        <tr>
+          <th>Maestra</th>
+          <th>Alumno</th>
+          <th>Libro</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-  let prestamos = [];         
-  let prestamosSesion = [];   
-  let responsableActual = null;  // Guardo el responsable escaneado para la sesión
+  <script>
+    const url = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
 
-  async function cargarPrestamosDesdeSheets() {
-    try {
-      const response = await fetch(SHEETS_WEBHOOK_URL);
-      if (!response.ok) throw new Error("Error al cargar datos");
-      const data = await response.json();
-      prestamos = data.map(item => ({
-        responsable: item.Responsable,
-        alumno: item.Alumno,
-        libro: item.Libro,
-        fecha: item.Fecha,
-      }));
-    } catch (error) {
-      console.error("No se pudieron cargar los préstamos:", error);
+    let responsable = "";
+    let alumno = "";
+    let libro = "";
+    let estado = "responsable"; // otros valores: 'alumno', 'libro'
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function iniciarScanner() {
+      document.getElementById("btnIniciarEscaneo").style.display = "none";
+      document.getElementById("reader").style.display = "block";
+
+      Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length) {
+          html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            onScanSuccess
+          );
+        } else {
+          alert("No se encontró cámara.");
+        }
+      }).catch(err => {
+        alert("Error accediendo a la cámara: " + err);
+      });
     }
-  }
 
-  function guardarSesion() {
-    sessionStorage.setItem("prestamosSesion", JSON.stringify(prestamosSesion));
-    if(responsableActual) {
-      sessionStorage.setItem("responsableActual", responsableActual);
+    function onScanSuccess(decodedText, decodedResult) {
+      if (estado === "responsable") {
+        responsable = decodedText;
+        document.getElementById("responsableSection").style.display = "none";
+        document.getElementById("registroSection").style.display = "block";
+        estado = "alumno";
+      } else if (estado === "alumno") {
+        alumno = decodedText;
+        document.getElementById("alumno").value = alumno;
+        estado = "libro";
+      } else if (estado === "libro") {
+        libro = decodedText;
+        document.getElementById("libro").value = libro;
+        registrarPrestamo();
+        estado = "alumno";
+        document.getElementById("alumno").value = "";
+        document.getElementById("libro").value = "";
+      }
     }
-  }
 
-  function cargarSesion() {
-    const datosGuardados = sessionStorage.getItem("prestamosSesion");
-    if (datosGuardados) {
-      prestamosSesion = JSON.parse(datosGuardados);
-      actualizarTabla();
+    function registrarPrestamo() {
+      const fecha = new Date().toLocaleDateString("es-AR");
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({ responsable, alumno, libro, fecha }),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === "success") {
+          agregarFilaATabla("tablaPrestamos", { responsable, alumno, libro, fecha });
+        } else {
+          alert("Error al registrar préstamo.");
+        }
+      });
     }
-    const responsableGuardado = sessionStorage.getItem("responsableActual");
-    if(responsableGuardado) {
-      responsableActual = responsableGuardado;
-      document.getElementById("responsableInput").value = responsableActual;
-      // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
-      document.getElementById("responsableInput").setAttribute("readonly", true);
-      // También desactivo el botón de escaneo del responsable
-      document.getElementById("btnResponsableScan").disabled = true;
-      document.getElementById("btnResponsableScan").style.opacity = 0.5;
-    }
-  }
 
-  function registrarPrestamo() {
-    if(!responsableActual) {
-      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
-      return;
-    }
-    const libro = document.getElementById('libroInput').value.trim();
-    const alumno = document.getElementById('alumnoInput').value.trim();
-    if (!libro || !alumno) {
-      alert("Escaneá primero el código QR del alumno y del libro");
-      return;
-    }
-    const fecha = new Date().toLocaleString();
-    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
-
-    prestamosSesion.push(nuevoPrestamo);
-    prestamos.push(nuevoPrestamo);
-    guardarSesion();
-    actualizarTabla();
-
-    document.getElementById('libroInput').value = "";
-    document.getElementById('alumnoInput').value = "";
-
-    fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(nuevoPrestamo)
-    });
-
-    alert("¡Préstamo registrado!");
-  }
-
-  function actualizarTabla() {
-    const tabla = document.getElementById("prestamosTable");
-    tabla.innerHTML = "";
-    prestamosSesion.forEach(p => {
+    function agregarFilaATabla(idTabla, datos) {
+      const tabla = document.getElementById(idTabla).getElementsByTagName("tbody")[0];
       const fila = tabla.insertRow();
-      fila.insertCell(0).textContent = p.responsable;
-      fila.insertCell(1).textContent = p.libro;
-      fila.insertCell(2).textContent = p.alumno;
-      fila.insertCell(3).textContent = p.fecha;
-    });
-  }
-
-  function buscar() {
-    const consulta = document.getElementById("busqueda").value.toLowerCase().trim();
-    if (!consulta) {
-      document.getElementById("resultadosBusqueda").innerHTML = "";
-      return;
+      fila.insertCell(0).textContent = datos.responsable;
+      fila.insertCell(1).textContent = datos.alumno;
+      fila.insertCell(2).textContent = datos.libro;
+      fila.insertCell(3).textContent = datos.fecha;
     }
-    const resultados = prestamos.filter(p =>
-      p.libro.toLowerCase().includes(consulta) || p.alumno.toLowerCase().includes(consulta)
-    );
-    mostrarResultados("Búsqueda", consulta, resultados);
-  }
 
-  function mostrarResultados(tipo, consulta, resultados) {
-    const contenedor = document.getElementById("resultadosBusqueda");
-    if (resultados.length === 0) {
-      contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
-      return;
+    function buscarPrestamo() {
+      const termino = document.getElementById("busqueda").value.toLowerCase();
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const resultados = data.filter(p =>
+            (p.Alumno && p.Alumno.toLowerCase().includes(termino)) ||
+            (p.Libro && p.Libro.toLowerCase().includes(termino))
+          );
+          const cuerpo = document.getElementById("tablaBusqueda").getElementsByTagName("tbody")[0];
+          cuerpo.innerHTML = "";
+          resultados.forEach(p => agregarFilaATabla("tablaBusqueda", {
+            responsable: p.Responsable,
+            alumno: p.Alumno,
+            libro: p.Libro,
+            fecha: p.Fecha
+          }));
+        })
+        .catch(err => {
+          alert("Error al buscar en la base de datos.");
+        });
     }
-    let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
-    resultados.forEach(p => {
-      html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
-    });
-    html += "</ul>";
-    contenedor.innerHTML = html;
-  }
 
-  // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
-  let currentScanner = null;
-  function startScanner(inputId) {
-    if (currentScanner) {
-      currentScanner.clear().then(() => {
-        document.getElementById("scannerModal").style.display = "none";
-      });
+    function resetear() {
+      alumno = "";
+      libro = "";
+      estado = "alumno";
+      document.getElementById("alumno").value = "";
+      document.getElementById("libro").value = "";
     }
-    const scannerModal = document.getElementById("scannerModal");
-    scannerModal.style.display = "flex";
-    scannerModal.dataset.inputId = inputId;
+  </script>
 
-    const scannerDiv = document.getElementById("scanner");
-    scannerDiv.innerHTML = "";
-
-    currentScanner = new Html5Qrcode("scanner");
-
-    currentScanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 280, height: 280 }
-      },
-      qrCodeMessage => {
-        document.getElementById(inputId).value = qrCodeMessage;
-
-        // Actualizo responsableActual si es responsableInput
-        if(inputId === "responsableInput") {
-          responsableActual = qrCodeMessage;
-          sessionStorage.setItem("responsableActual", responsableActual);
-          // Bloqueo input y botón responsable
-          const respInput = document.getElementById("responsableInput");
-          respInput.setAttribute("readonly", true);
-          const btnResp = document.getElementById("btnResponsableScan");
-          btnResp.disabled = true;
-          btnResp.style.opacity = 0.5;
-        }
-
-        stopScanner();
-
-        // Si escaneamos el alumno, abrimos automáticamente escáner del libro
-        if(inputId === "alumnoInput") {
-          setTimeout(() => {
-            startScanner("libroInput");
-          }, 2000);  // 2 segundos de espera antes de abrir escáner del libro
-        }
-      },
-      errorMessage => {}
-    ).catch(err => {
-      alert("No se pudo acceder a la cámara");
-      stopScanner();
-    });
-  }
-
-  function stopScanner() {
-    if (currentScanner) {
-      currentScanner.stop().then(() => {
-        currentScanner.clear();
-        currentScanner = null;
-        document.getElementById("scannerModal").style.display = "none";
-      }).catch((e) => {
-        console.error("Error deteniendo el escáner:", e);
-      });
-    } else {
-      document.getElementById("scannerModal").style.display = "none";
-    }
-  }
-
-  document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
-
-  window.onload = () => {
-    cargarSesion();
-    cargarPrestamosDesdeSheets();
-  };
-</script>
-
- </body>
+</body>
 </html>
