@@ -103,16 +103,45 @@
     td {
       background-color: #fefefe;
     }
-    input[type="text"] {
-      padding: 10px;
+
+    /* Nuevo estilo para inputs con ícono */
+    .input-with-icon {
+      position: relative;
+      display: inline-block;
       width: 80%;
       max-width: 400px;
       margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .input-with-icon input {
+      padding-right: 40px; /* espacio para el icono */
+      width: 100%;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: white;
+      color: #333;
+      text-align: left;
+    }
+    .input-with-icon input::placeholder {
+      color: #888;
+    }
+    .input-with-icon .icon-camera {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      pointer-events: none; /* para que no bloquee el click al input */
+      color: #555;
+    }
+
+    input[type="text"] {
       cursor: pointer;
     }
+
     #resultadosBusqueda {
       margin: 30px auto;
       max-width: 650px;
@@ -149,9 +178,11 @@
         width: 100%;
         max-width: 100vw;
       }
-      input[type="text"] {
+      .input-with-icon {
         width: 95vw;
         max-width: 98vw;
+      }
+      .input-with-icon input {
         font-size: 1em;
       }
       .search-label {
@@ -210,19 +241,27 @@
   </h1>
   <p style="font-size:1em; color:#666; margin-bottom:14px;">
    Si est&aacute;s usando un celular, acepta el permiso de c&aacute;mara para escanear c&oacute;digos QR.
+  </p>
   <!-- Botón para mostrar instrucciones -->
-<div style="margin-top: 10px;">
-  <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
-</div>
-  <div>
-   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly type="text" onclick="startScanner('responsableInput')"/>
+  <div style="margin-top: 10px;">
+    <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
   </div>
-  <div>
-   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly type="text" onclick="startScanner('alumnoInput')"/>
+
+  <div class="input-with-icon" onclick="startScanner('responsableInput')">
+    <input id="responsableInput" placeholder="Escaneá el QR del responsable" readonly type="text" />
+    <span class="icon-camera">📷</span>
   </div>
-  <div>
-   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly type="text" onclick="startScanner('libroInput')"/>
+
+  <div class="input-with-icon" onclick="startScanner('alumnoInput')">
+    <input id="alumnoInput" placeholder="Escaneá el QR del alumno" readonly type="text" />
+    <span class="icon-camera">📷</span>
   </div>
+
+  <div class="input-with-icon" onclick="startScanner('libroInput')">
+    <input id="libroInput" placeholder="Escaneá el QR del libro" readonly type="text" />
+    <span class="icon-camera">📷</span>
+  </div>
+
   <button id="registrarBtn" onclick="registrarPrestamo()" style="background-color:#4a4e69;">
     Registrar Pr&eacute;stamo
   </button>
@@ -314,8 +353,6 @@
       document.getElementById("responsableInput").value = responsableActual;
       // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
       document.getElementById("responsableInput").setAttribute("readonly", true);
-      // También desactivo el botón de escaneo del responsable
-      // Ya no hay botón, por eso no hace falta desactivar
     }
   }
 
@@ -464,11 +501,4 @@
     }
   });
 
-  window.onload = () => {
-    cargarSesion();
-    cargarPrestamosDesdeSheets();
-  };
-</script>
-
- </body>
-</html>
+  window
