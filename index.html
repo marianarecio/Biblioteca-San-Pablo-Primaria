@@ -1,232 +1,144 @@
 <!DOCTYPE html>
 <html lang="es">
- <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Biblioteca Primaria Colegio San Pablo</title>
+
   <!-- Fuente Jost -->
   <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet"/>
+
   <style>
     body {
       font-family: 'Jost', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f4;
-      color: #333;
       text-align: center;
+      background-color: #f4f4f4;
     }
 
     h1 {
-      background-color: #005691;
+      background-color: #2b5c99;
       color: white;
-      padding: 20px;
       margin: 0;
+      padding: 1rem;
     }
 
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .scanner-container {
+    .scanner-section {
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
-      margin-top: 20px;
+      align-items: center;
+      margin-top: 1rem;
     }
 
-    .input-section {
-      margin: 10px 0;
+    label {
+      margin-top: 1rem;
+      font-weight: bold;
     }
 
     input[type="text"] {
       padding: 10px;
       font-size: 1em;
-      width: 80%;
-      max-width: 300px;
-      margin-bottom: 10px;
+      width: 90%;
+      max-width: 400px;
+      margin-top: 0.5rem;
     }
 
-    #reader {
-      width: 300px;
-      margin: auto;
+    button {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #2b5c99;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-family: 'Jost', sans-serif;
+    }
+
+    button:hover {
+      background-color: #244a7d;
     }
 
     table {
-      width: 90%;
-      margin: 20px auto;
+      width: 95%;
+      margin: 2rem auto;
       border-collapse: collapse;
+      font-size: 0.9em;
     }
 
     th, td {
       border: 1px solid #ccc;
-      padding: 10px;
-      text-align: left;
+      padding: 8px;
     }
 
     th {
-      background-color: #005691;
+      background-color: #2b5c99;
       color: white;
     }
 
-    #modalInstrucciones h3 {
-      margin-top: 0;
+    /* Modal */
+    #modalInstrucciones {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-contenido {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 90%;
+      width: 400px;
+      text-align: left;
+      position: relative;
+      font-size: 1em;
+    }
+
+    .modal-cerrar {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e57373;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
- </head>
- <body>
-  <h1>Biblioteca Primaria - Colegio San Pablo</h1>
+</head>
+<body>
 
-  <button onclick="abrirInstrucciones()" style="background-color:#6c757d;">
-    ❓ ¿Cómo se usa esta página web?
-  </button>
+  <h1>Biblioteca Primaria Colegio San Pablo</h1>
 
-  <div class="scanner-container">
-    <div class="input-section">
-      <label for="responsable">Responsable:</label><br/>
-      <input type="text" id="responsable" placeholder="Escaneá el QR del responsable"/>
-      <button onclick="startScanner('responsable')">📷 Escanear</button>
-    </div>
-    <div class="input-section">
-      <label for="alumno">Alumno:</label><br/>
-      <input type="text" id="alumno" placeholder="Escaneá el QR del alumno"/>
-      <button onclick="startScanner('alumno')">📷 Escanear</button>
-    </div>
-    <div class="input-section">
-      <label for="libro">Libro:</label><br/>
-      <input type="text" id="libro" placeholder="Escaneá el QR del libro"/>
-      <button onclick="startScanner('libro')">📷 Escanear</button>
-    </div>
-    <button onclick="registrarPrestamo()">Registrar Préstamo</button>
-    <div id="reader" style="display:none;"></div>
+  <!-- Botón para abrir instrucciones -->
+  <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
+
+  <div class="scanner-section">
+    <!-- Tu formulario o campos de escaneo seguirían aquí -->
   </div>
 
-  <h2>Préstamos registrados hoy</h2>
-  <table id="prestamosTable">
-    <thead>
-      <tr>
-        <th>Responsable</th>
-        <th>Alumno</th>
-        <th>Libro</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <h2>Buscar préstamos</h2>
-  <div class="input-section">
-    <input type="text" id="buscarInput" placeholder="Buscar por alumno o libro" onkeydown="if(event.key === 'Enter'){buscarPrestamos()}"/>
-    <button onclick="buscarPrestamos()">Buscar</button>
-  </div>
-  <table id="resultadosBusqueda">
-    <thead>
-      <tr>
-        <th>Responsable</th>
-        <th>Alumno</th>
-        <th>Libro</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <!-- Modal de instrucciones -->
-  <div id="modalInstrucciones" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-    <div style="background:#fff; padding:20px; border-radius:10px; max-width:500px; width:90%; text-align:left; position:relative; font-size:1em; line-height:1.5;">
-      <button onclick="cerrarInstrucciones()" style="position:absolute; top:10px; right:10px; background:#e57373; color:white; border:none; border-radius:50%; width:30px; height:30px; font-size:18px; cursor:pointer;">×</button>
-      <h3>📖 Instrucciones</h3>
+  <!-- Modal -->
+  <div id="modalInstrucciones">
+    <div class="modal-contenido">
+      <button class="modal-cerrar" onclick="cerrarInstrucciones()">×</button>
+      <h2>📖 Instrucciones</h2>
       <p>
-        Escaneá primero el código QR del <strong>responsable</strong> para iniciar sesión.
+        Escaneá primero el código QR del <strong>responsable</strong> para iniciar sesión.<br/><br/>
         Luego, escaneá el código QR del <strong>alumno</strong> y el del <strong>libro</strong> para registrar un préstamo.<br/><br/>
         El código del responsable se mantendrá durante toda la sesión.
       </p>
     </div>
   </div>
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
   <script>
-    let campoActivo = "";
-    const urlScript = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
-
-    function startScanner(campo) {
-      campoActivo = campo;
-      const scanner = new Html5Qrcode("reader");
-      document.getElementById("reader").style.display = "block";
-      scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
-          document.getElementById(campoActivo).value = decodedText;
-          scanner.stop().then(() => {
-            document.getElementById("reader").style.display = "none";
-          });
-        },
-        (error) => {}
-      );
-    }
-
-    function registrarPrestamo() {
-      const responsable = document.getElementById("responsable").value.trim();
-      const alumno = document.getElementById("alumno").value.trim();
-      const libro = document.getElementById("libro").value.trim();
-      if (!responsable || !alumno || !libro) {
-        alert("Por favor, completá todos los campos.");
-        return;
-      }
-      const data = new URLSearchParams({
-        responsable,
-        alumno,
-        libro,
-        fecha: new Date().toLocaleString("es-AR")
-      });
-      fetch(urlScript + "?" + data.toString())
-        .then((res) => res.json())
-        .then((r) => {
-          if (r.result === "success") {
-            mostrarPrestamo(responsable, alumno, libro, new Date().toLocaleString("es-AR"));
-            document.getElementById("alumno").value = "";
-            document.getElementById("libro").value = "";
-            document.getElementById("alumno").focus();
-          }
-        });
-    }
-
-    function mostrarPrestamo(responsable, alumno, libro, fecha) {
-      const tabla = document.querySelector("#prestamosTable tbody");
-      const fila = tabla.insertRow();
-      fila.innerHTML = `<td>${responsable}</td><td>${alumno}</td><td>${libro}</td><td>${fecha}</td>`;
-    }
-
-    function buscarPrestamos() {
-      const busqueda = document.getElementById("buscarInput").value.trim().toLowerCase();
-      fetch(urlScript + "?action=buscar")
-        .then((res) => res.json())
-        .then((datos) => {
-          const resultados = datos.filter(p =>
-            p.alumno.toLowerCase().includes(busqueda) ||
-            p.libro.toLowerCase().includes(busqueda)
-          );
-          const tabla = document.querySelector("#resultadosBusqueda tbody");
-          tabla.innerHTML = "";
-          resultados.forEach(p => {
-            const fila = tabla.insertRow();
-            fila.innerHTML = `<td>${p.responsable}</td><td>${p.alumno}</td><td>${p.libro}</td><td>${p.fecha}</td>`;
-          });
-        });
-    }
-
     function abrirInstrucciones() {
       document.getElementById("modalInstrucciones").style.display = "flex";
     }
@@ -235,5 +147,6 @@
       document.getElementById("modalInstrucciones").style.display = "none";
     }
   </script>
- </body>
+
+</body>
 </html>
