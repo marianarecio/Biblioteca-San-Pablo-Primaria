@@ -8,208 +8,171 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      max-width: 800px;
+      max-width: 600px;
       margin: auto;
-      background-color: #f9f9f9;
     }
-
-    h1 {
+    h1, h2 {
       text-align: center;
     }
-
     label {
-      font-weight: bold;
+      display: block;
+      margin-top: 15px;
     }
-
-    input, button, select {
-      padding: 8px;
-      margin: 8px 0;
+    input[type="text"] {
       width: 100%;
-      box-sizing: border-box;
+      padding: 10px;
+      margin-top: 5px;
     }
-
-    .registro, .busqueda {
-      background-color: #fff;
-      padding: 16px;
-      margin-top: 24px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
+      margin-top: 25px;
     }
-
     th, td {
-      border: 1px solid #ccc;
       padding: 8px;
+      border: 1px solid #ccc;
       text-align: left;
     }
-
-    th {
-      background-color: #eee;
-    }
-
-    .button-group {
-      display: flex;
-      justify-content: space-between;
+    #scanner-container {
+      display: none;
     }
   </style>
 </head>
 <body>
-
   <h1>Registro de Préstamos</h1>
 
-  <div class="registro">
-    <h2>Nuevo Préstamo</h2>
-    <label>Responsable:</label>
-    <input type="text" id="responsable" placeholder="Nombre del responsable" />
+  <form id="formulario-prestamo">
+    <label for="responsable">Responsable:</label>
+    <input type="text" id="responsable" required />
 
-    <label>Alumno:</label>
-    <input type="text" id="alumno" placeholder="Nombre del alumno" />
+    <label for="alumno">Alumno:</label>
+    <input type="text" id="alumno" required />
 
-    <label>Libro:</label>
-    <input type="text" id="libro" placeholder="Nombre del libro" />
+    <label for="libro">Libro:</label>
+    <input type="text" id="libro" required />
 
-    <button onclick="registrarPrestamo()">Registrar Préstamo</button>
+    <button type="submit">Registrar Préstamo</button>
+  </form>
 
-    <h3>Préstamos Registrados (en esta sesión)</h3>
-    <table id="tablaPrestamos">
-      <thead>
-        <tr>
-          <th>Responsable</th>
-          <th>Alumno</th>
-          <th>Libro</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody id="prestamosBody"></tbody>
-    </table>
-  </div>
+  <h2>Préstamos Registrados (esta sesión)</h2>
+  <table id="tabla-prestamos">
+    <thead>
+      <tr>
+        <th>Responsable</th>
+        <th>Alumno</th>
+        <th>Libro</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <div class="busqueda">
-    <h2>Búsqueda en la Base de Datos</h2>
+  <h2>Buscar Préstamos</h2>
+  <input type="text" id="busqueda" placeholder="Buscar por alumno o libro" />
+  <button onclick="buscarPrestamos()">Buscar</button>
 
-    <label>Búsqueda por alumno o libro:</label>
-    <input type="text" id="busquedaUnica" placeholder="Nombre del alumno o del libro" />
-
-    <button onclick="buscar()">Buscar</button>
-
-    <table id="tablaResultados" style="display:none;">
-      <thead>
-        <tr>
-          <th>Responsable</th>
-          <th>Alumno</th>
-          <th>Libro</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody id="resultadosBody"></tbody>
-    </table>
-  </div>
+  <table id="tabla-busqueda">
+    <thead>
+      <tr>
+        <th>Responsable</th>
+        <th>Alumno</th>
+        <th>Libro</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
     const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
-    let prestamosSesion = [];
 
-    function registrarPrestamo() {
-      const responsable = document.getElementById('responsable').value.trim();
-      const alumno = document.getElementById('alumno').value.trim();
-      const libro = document.getElementById('libro').value.trim();
-      const fecha = new Date().toLocaleString('es-AR');
+    const prestamosSesion = [];
 
-      if (!responsable || !alumno || !libro) {
-        alert('Por favor, completá todos los campos.');
-        return;
-      }
+    document.getElementById("formulario-prestamo").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const responsable = document.getElementById("responsable").value.trim();
+      const alumno = document.getElementById("alumno").value.trim();
+      const libro = document.getElementById("libro").value.trim();
+      const fecha = new Date().toLocaleDateString("es-AR");
 
-      const prestamo = { responsable, alumno, libro, fecha };
+      if (!responsable || !alumno || !libro) return;
 
-      fetch(SHEETS_WEBHOOK_URL, {
-        method: 'POST',
-        body: JSON.stringify(prestamo),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.result === "success") {
-          prestamosSesion.push(prestamo);
-          mostrarPrestamosSesion();
-          document.getElementById('responsable').value = '';
-          document.getElementById('alumno').value = '';
-          document.getElementById('libro').value = '';
+      const data = { responsable, alumno, libro, fecha };
+
+      try {
+        const response = await fetch(SHEETS_WEBHOOK_URL, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const result = await response.json();
+        if (result.result === "success") {
+          agregarFila("tabla-prestamos", data);
+          prestamosSesion.push(data);
+          document.getElementById("formulario-prestamo").reset();
         } else {
           alert("Error al registrar el préstamo.");
         }
-      })
-      .catch(error => {
-        alert("Error al conectar con el servidor.");
-        console.error(error);
+      } catch (error) {
+        alert("No se pudo conectar con el servidor.");
+      }
+    });
+
+    function agregarFila(idTabla, filaData) {
+      const tbody = document.querySelector(`#${idTabla} tbody`);
+      const row = document.createElement("tr");
+      ["responsable", "alumno", "libro", "fecha"].forEach((key) => {
+        const cell = document.createElement("td");
+        cell.textContent = filaData[key];
+        row.appendChild(cell);
       });
+      tbody.appendChild(row);
     }
 
-    function mostrarPrestamosSesion() {
-      const cuerpo = document.getElementById('prestamosBody');
-      cuerpo.innerHTML = "";
-      prestamosSesion.forEach(p => {
-        const fila = `<tr>
-          <td>${p.responsable}</td>
-          <td>${p.alumno}</td>
-          <td>${p.libro}</td>
-          <td>${p.fecha}</td>
-        </tr>`;
-        cuerpo.innerHTML += fila;
-      });
-    }
-
-    function buscar() {
-      const termino = document.getElementById("busquedaUnica").value.trim().toLowerCase();
+    async function buscarPrestamos() {
+      const termino = document.getElementById("busqueda").value.toLowerCase().trim();
+      const tbody = document.querySelector("#tabla-busqueda tbody");
+      tbody.innerHTML = "";
 
       if (!termino) return;
 
-      fetch(SHEETS_WEBHOOK_URL)
-        .then(response => response.json())
-        .then(data => {
-          const resultados = data.filter(p =>
-            (p.alumno && p.alumno.toLowerCase().includes(termino)) ||
-            (p.libro && p.libro.toLowerCase().includes(termino))
-          );
+      try {
+        const response = await fetch(SHEETS_WEBHOOK_URL);
+        const datos = await response.json();
 
-          const cuerpo = document.getElementById("resultadosBody");
-          cuerpo.innerHTML = "";
+        const resultados = datos.filter(
+          row =>
+            (row.alumno && row.alumno.toLowerCase().includes(termino)) ||
+            (row.libro && row.libro.toLowerCase().includes(termino))
+        );
 
-          if (resultados.length > 0) {
-            resultados.forEach(p => {
-              const fila = `<tr>
-                <td>${p.responsable}</td>
-                <td>${p.alumno}</td>
-                <td>${p.libro}</td>
-                <td>${p.fecha}</td>
-              </tr>`;
-              cuerpo.innerHTML += fila;
-            });
-            document.getElementById("tablaResultados").style.display = "table";
-          } else {
-            document.getElementById("tablaResultados").style.display = "none";
-            alert("No se encontraron resultados.");
-          }
-        })
-        .catch(error => {
-          alert("Error al buscar en la base de datos.");
-          console.error(error);
-        });
+        if (resultados.length === 0) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 4;
+          cell.textContent = "No se encontraron resultados.";
+          row.appendChild(cell);
+          tbody.appendChild(row);
+        } else {
+          resultados.forEach(r => agregarFila("tabla-busqueda", r));
+        }
+      } catch (error) {
+        alert("Error al buscar en la base de datos.");
+      }
     }
 
-    // Activar búsqueda con tecla Enter
-    document.getElementById("busquedaUnica").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        buscar();
+    // Permite buscar al presionar Enter
+    document.getElementById("busqueda").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        buscarPrestamos();
       }
     });
   </script>
-
 </body>
 </html>
