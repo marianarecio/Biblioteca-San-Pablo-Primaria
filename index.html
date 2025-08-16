@@ -422,11 +422,11 @@
         stopScanner();
 
         // Si escaneamos el alumno, abrimos automáticamente escáner del libro
-        if(inputId === "alumnoInput") {
-          setTimeout(() => {
-            startScanner("libroInput");
-          }, 500);
-        }
+       if(inputId === "alumnoInput") {
+  setTimeout(() => {
+    startScanner("libroInput");
+  }, 3000);  // 3 segundos de espera antes de abrir escáner del libro
+}
       },
       errorMessage => {}
     ).catch(err => {
