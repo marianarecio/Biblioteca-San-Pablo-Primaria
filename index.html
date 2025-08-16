@@ -3,176 +3,223 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Biblioteca Escolar</title>
+  <title>Biblioteca Primaria - Colegio San Pablo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      margin: 20px;
+      background-color: #f9f9f9;
+      color: #333;
     }
-    h1, h2 {
-      text-align: center;
+    h1, h2, h3 {
+      color: #4a4a4a;
+    }
+    .form-section, .search-box {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     label {
-      display: block;
-      margin-top: 15px;
+      font-weight: bold;
     }
-    input[type="text"] {
-      width: 100%;
+    input, select, button {
       padding: 10px;
-      margin-top: 5px;
+      margin: 5px 0 15px 0;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: block;
     }
     button {
-      margin-top: 15px;
-      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 25px;
+      margin-top: 15px;
     }
     th, td {
+      border: 1px solid #ddd;
       padding: 8px;
-      border: 1px solid #ccc;
       text-align: left;
     }
-    #scanner-container {
+    th {
+      background-color: #f2f2f2;
+    }
+    #reader {
+      width: 300px;
+      margin: auto;
       display: none;
     }
+    .search-label {
+      margin-top: 10px;
+      display: block;
+    }
   </style>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-  <h1>Registro de Préstamos</h1>
+  <h1>📚 Biblioteca Primaria - Colegio San Pablo</h1>
 
-  <form id="formulario-prestamo">
-    <label for="responsable">Responsable:</label>
-    <input type="text" id="responsable" required />
+  <div class="form-section">
+    <h2>Registrar préstamo</h2>
+    <label for="responsable">Responsable</label>
+    <input type="text" id="responsable" placeholder="Nombre del responsable"/>
 
-    <label for="alumno">Alumno:</label>
-    <input type="text" id="alumno" required />
+    <label for="alumno">Alumno</label>
+    <input type="text" id="alumno" placeholder="Nombre o código del alumno"/>
+    <button onclick="startScanner('alumno')">📷 Escanear alumno</button>
 
-    <label for="libro">Libro:</label>
-    <input type="text" id="libro" required />
+    <label for="libro">Libro</label>
+    <input type="text" id="libro" placeholder="Título o código del libro"/>
+    <button onclick="startScanner('libro')">📷 Escanear libro</button>
 
-    <button type="submit">Registrar Préstamo</button>
-  </form>
+    <button onclick="registrarPrestamo()">Registrar préstamo</button>
+  </div>
 
-  <h2>Préstamos Registrados (esta sesión)</h2>
-  <table id="tabla-prestamos">
-    <thead>
-      <tr>
-        <th>Responsable</th>
-        <th>Alumno</th>
-        <th>Libro</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="reader"></div>
 
-  <h2>Buscar Préstamos</h2>
-  <input type="text" id="busqueda" placeholder="Buscar por alumno o libro" />
-  <button onclick="buscarPrestamos()">Buscar</button>
+  <div class="form-section">
+    <h2>Préstamos registrados (solo esta sesión)</h2>
+    <table id="tablaPrestamos">
+      <thead>
+        <tr>
+          <th>Responsable</th>
+          <th>Alumno</th>
+          <th>Libro</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-  <table id="tabla-busqueda">
-    <thead>
-      <tr>
-        <th>Responsable</th>
-        <th>Alumno</th>
-        <th>Libro</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="search-box">
+    <h3>🔍 Buscar información</h3>
+    <label class="search-label" for="buscarGeneral">Buscar por libro o alumno</label>
+    <input id="buscarGeneral" placeholder="Ej: nombre o código de libro o alumno" type="text" onkeydown="if(event.key === 'Enter'){ buscarGeneral(); }"/>
+    <button onclick="buscarGeneral()">Buscar</button>
+  </div>
+  <div id="resultadosBusqueda"></div>
 
   <script>
-    const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
+    const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec';
+    let prestamos = [];
 
-    const prestamosSesion = [];
+    function registrarPrestamo() {
+      const responsable = document.getElementById('responsable').value;
+      const alumno = document.getElementById('alumno').value;
+      const libro = document.getElementById('libro').value;
+      const fecha = new Date().toLocaleDateString('es-AR');
 
-    document.getElementById("formulario-prestamo").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const responsable = document.getElementById("responsable").value.trim();
-      const alumno = document.getElementById("alumno").value.trim();
-      const libro = document.getElementById("libro").value.trim();
-      const fecha = new Date().toLocaleDateString("es-AR");
-
-      if (!responsable || !alumno || !libro) return;
-
-      const data = { responsable, alumno, libro, fecha };
-
-      try {
-        const response = await fetch(SHEETS_WEBHOOK_URL, {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const result = await response.json();
-        if (result.result === "success") {
-          agregarFila("tabla-prestamos", data);
-          prestamosSesion.push(data);
-          document.getElementById("formulario-prestamo").reset();
-        } else {
-          alert("Error al registrar el préstamo.");
-        }
-      } catch (error) {
-        alert("No se pudo conectar con el servidor.");
+      if (!responsable || !alumno || !libro) {
+        alert('Por favor, completá todos los campos');
+        return;
       }
-    });
 
-    function agregarFila(idTabla, filaData) {
-      const tbody = document.querySelector(`#${idTabla} tbody`);
-      const row = document.createElement("tr");
-      ["responsable", "alumno", "libro", "fecha"].forEach((key) => {
-        const cell = document.createElement("td");
-        cell.textContent = filaData[key];
-        row.appendChild(cell);
+      const datos = { responsable, alumno, libro, fecha };
+
+      fetch(SHEETS_WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify(datos),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(r => r.text())
+      .then(res => {
+        agregarAFila(datos);
+        prestamos.push(datos);
+        document.getElementById('responsable').value = '';
+        document.getElementById('alumno').value = '';
+        document.getElementById('libro').value = '';
       });
-      tbody.appendChild(row);
     }
 
-    async function buscarPrestamos() {
-      const termino = document.getElementById("busqueda").value.toLowerCase().trim();
-      const tbody = document.querySelector("#tabla-busqueda tbody");
-      tbody.innerHTML = "";
+    function agregarAFila(p) {
+      const tabla = document.getElementById('tablaPrestamos').getElementsByTagName('tbody')[0];
+      const fila = tabla.insertRow();
+      fila.insertCell(0).innerText = p.responsable;
+      fila.insertCell(1).innerText = p.alumno;
+      fila.insertCell(2).innerText = p.libro;
+      fila.insertCell(3).innerText = p.fecha;
+    }
 
-      if (!termino) return;
+    function buscarGeneral() {
+      const consulta = document.getElementById("buscarGeneral").value.trim().toLowerCase();
+      if (!prestamos.length) {
+        // Si prestamos está vacío, consultamos la base
+        fetch(SHEETS_WEBHOOK_URL)
+          .then(response => response.json())
+          .then(data => {
+            prestamos = data;
+            filtrarYMostrar(consulta);
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Error al buscar en la base de datos.");
+          });
+      } else {
+        filtrarYMostrar(consulta);
+      }
+    }
 
-      try {
-        const response = await fetch(SHEETS_WEBHOOK_URL);
-        const datos = await response.json();
+    function filtrarYMostrar(consulta) {
+      const resultados = prestamos.filter(p =>
+        p.libro.toLowerCase().includes(consulta) ||
+        p.alumno.toLowerCase().includes(consulta)
+      );
+      mostrarResultados("Consulta", consulta, resultados);
+    }
 
-        const resultados = datos.filter(
-          row =>
-            (row.alumno && row.alumno.toLowerCase().includes(termino)) ||
-            (row.libro && row.libro.toLowerCase().includes(termino))
-        );
+    function mostrarResultados(tipo, valor, resultados) {
+      const contenedor = document.getElementById("resultadosBusqueda");
+      if (resultados.length === 0) {
+        contenedor.innerHTML = `<p>No se encontraron resultados para "${valor}".</p>`;
+        return;
+      }
+      let html = `<h3>Resultados para "${valor}":</h3>`;
+      html += `<table><thead><tr><th>Responsable</th><th>Alumno</th><th>Libro</th><th>Fecha</th></tr></thead><tbody>`;
+      resultados.forEach(p => {
+        html += `<tr><td>${p.responsable}</td><td>${p.alumno}</td><td>${p.libro}</td><td>${p.fecha}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+      contenedor.innerHTML = html;
+    }
 
-        if (resultados.length === 0) {
-          const row = document.createElement("tr");
-          const cell = document.createElement("td");
-          cell.colSpan = 4;
-          cell.textContent = "No se encontraron resultados.";
-          row.appendChild(cell);
-          tbody.appendChild(row);
-        } else {
-          resultados.forEach(r => agregarFila("tabla-busqueda", r));
+    function startScanner(campoId) {
+      const reader = document.getElementById('reader');
+      reader.style.display = 'block';
+      const html5QrCode = new Html5Qrcode("reader");
+
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+          const cameraId = devices[0].id;
+          html5QrCode.start(
+            cameraId,
+            { fps: 10, qrbox: 250 },
+            qrCodeMessage => {
+              document.getElementById(campoId).value = qrCodeMessage;
+              html5QrCode.stop().then(() => {
+                reader.style.display = 'none';
+              });
+            },
+            errorMessage => {}
+          );
         }
-      } catch (error) {
-        alert("Error al buscar en la base de datos.");
-      }
+      }).catch(err => {
+        console.error(err);
+      });
     }
-
-    // Permite buscar al presionar Enter
-    document.getElementById("busqueda").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        buscarPrestamos();
-      }
-    });
   </script>
 </body>
 </html>
