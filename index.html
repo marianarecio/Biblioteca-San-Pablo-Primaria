@@ -418,28 +418,51 @@
         qrbox: { width: 280, height: 280 }
       },
       qrCodeMessage => {
-  document.getElementById(inputId).value = qrCodeMessage;
+        document.getElementById(inputId).value = qrCodeMessage;
 
-  if(inputId === "responsableInput") {
-    responsableActual = qrCodeMessage;
-    sessionStorage.setItem("responsableActual", responsableActual);
-    const respInput = document.getElementById("responsableInput");
-    respInput.setAttribute("readonly", true);
-    const btnResp = document.getElementById("btnResponsableScan");
-    btnResp.disabled = true;
-    btnResp.style.opacity = 0.5;
+        if(inputId === "responsableInput") {
+          responsableActual = qrCodeMessage;
+          sessionStorage.setItem("responsableActual", responsableActual);
+          const respInput = document.getElementById("responsableInput");
+          respInput.setAttribute("readonly", true);
+          const btnResp = document.getElementById("btnResponsableScan");
+          btnResp.disabled = true;
+          btnResp.style.opacity = 0.5;
 
-    stopScanner(); // sí cerramos escáner cuando escaneamos responsable
-  } else if (inputId === "alumnoInput") {
-    // No cerramos escáner aquí
-    setTimeout(() => {
-      startScanner("libroInput");
-    }, 3000);
-  } else {
-    // Para el libro u otros casos, cerramos escáner normalmente
-    stopScanner();
+          stopScanner(); // cerramos escáner al leer responsable
+        } else if (inputId === "alumnoInput") {
+          // No cerramos escáner, abrimos libro después de 3 segundos
+          setTimeout(() => {
+            startScanner("libroInput");
+          }, 3000);
+        } else {
+          // Para libro u otros, cerramos escáner normalmente
+          stopScanner();
+        }
+      },
+      errorMessage => {
+        // Aquí se podrían manejar errores si quieres
+      }
+    ).catch(err => {
+      alert("No se pudo acceder a la cámara");
+      stopScanner();
+    });
   }
-}
+
+  function stopScanner() {
+    if (currentScanner) {
+      currentScanner.stop().then(() => {
+        currentScanner.clear();
+        currentScanner = null;
+        document.getElementById("scannerModal").style.display = "none";
+      }).catch((e) => {
+        console.error("Error deteniendo el escáner:", e);
+      });
+    } else {
+      document.getElementById("scannerModal").style.display = "none";
+    }
+  }
+
   document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
 
   window.onload = () => {
