@@ -339,7 +339,8 @@
       alert("Escaneá primero el código QR del alumno y del libro");
       return;
     }
-    const fecha = new Date().toLocaleString();
+   const ahora = new Date();
+const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
     const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
 
     prestamosSesion.push(nuevoPrestamo);
