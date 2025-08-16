@@ -191,33 +191,43 @@
   <p style="font-size: 1.3em; max-width: 98%; margin: 5px auto; line-height: 1.6;">
    Escane&aacute; primero el c&oacute;digo QR del
    <strong>
+    responsable
+   </strong>
+   para iniciar sesión.
+   <br/>
+   Luego, escane&aacute; el c&oacute;digo QR del
+   <strong>
     alumno
    </strong>
-   y luego el c&oacute;digo QR del
+   y el del
    <strong>
     libro
    </strong>
    para registrar un pr&eacute;stamo.
    <br/>
-   Tambi&eacute;n pod&eacute;s buscar libros y ver qu&eacute; alumnos los tomaron, o buscar alumnos para ver qu&eacute; libros tienen en pr&eacute;stamo.
+   El código del responsable se mantendrá durante toda la sesión.
   </p>
   <div>
-   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly="True" type="text"/>
-   <button onclick="startScanner('responsableInput')">
+   <input id="responsableInput" placeholder="Escane&aacute; el QR del responsable" readonly="" type="text"/>
+   <button id="btnResponsableScan" onclick="startScanner('responsableInput')">
     📷
-   </button>
-   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly="" type="text"/>
-   <button onclick="startScanner('alumnoInput')">
-    📷
-   </button>
-   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
-   <button onclick="startScanner('libroInput')">
-    📷
-   </button>
-   <button onclick="registrarPrestamo()" style="background-color:#4a4e69;">
-    Registrar Pr&eacute;stamo
    </button>
   </div>
+  <div>
+   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly="" type="text"/>
+   <button id="btnAlumnoScan" onclick="startScanner('alumnoInput')">
+    📷
+   </button>
+  </div>
+  <div>
+   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
+   <button id="btnLibroScan" onclick="startScanner('libroInput')">
+    📷
+   </button>
+  </div>
+  <button id="registrarBtn" onclick="registrarPrestamo()" style="background-color:#4a4e69;">
+    Registrar Pr&eacute;stamo
+  </button>
 
   <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">
    📋 Pr&eacute;stamos Registrados
@@ -269,6 +279,7 @@
 
   let prestamos = [];         
   let prestamosSesion = [];   
+  let responsableActual = null;  // Guardo el responsable escaneado para la sesión
 
   async function cargarPrestamosDesdeSheets() {
     try {
@@ -288,6 +299,9 @@
 
   function guardarSesion() {
     sessionStorage.setItem("prestamosSesion", JSON.stringify(prestamosSesion));
+    if(responsableActual) {
+      sessionStorage.setItem("responsableActual", responsableActual);
+    }
   }
 
   function cargarSesion() {
@@ -296,18 +310,31 @@
       prestamosSesion = JSON.parse(datosGuardados);
       actualizarTabla();
     }
+    const responsableGuardado = sessionStorage.getItem("responsableActual");
+    if(responsableGuardado) {
+      responsableActual = responsableGuardado;
+      document.getElementById("responsableInput").value = responsableActual;
+      // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
+      document.getElementById("responsableInput").setAttribute("readonly", true);
+      // También desactivo el botón de escaneo del responsable
+      document.getElementById("btnResponsableScan").disabled = true;
+      document.getElementById("btnResponsableScan").style.opacity = 0.5;
+    }
   }
 
   function registrarPrestamo() {
-    const responsable = document.getElementById('responsableInput').value.trim();
+    if(!responsableActual) {
+      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
+      return;
+    }
     const libro = document.getElementById('libroInput').value.trim();
     const alumno = document.getElementById('alumnoInput').value.trim();
-    if (!responsable || !libro || !alumno) {
-      alert("Escaneá primero el libro y el alumno");
+    if (!libro || !alumno) {
+      alert("Escaneá primero el código QR del alumno y del libro");
       return;
     }
     const fecha = new Date().toLocaleString();
-    const nuevoPrestamo = { responsable, libro, alumno, fecha };
+    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
 
     prestamosSesion.push(nuevoPrestamo);
     prestamos.push(nuevoPrestamo);
@@ -367,7 +394,7 @@
     contenedor.innerHTML = html;
   }
 
-  // Código para el escáner QR (sin cambios)
+  // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
   let currentScanner = null;
   function startScanner(inputId) {
     if (currentScanner) {
@@ -393,6 +420,13 @@
       qrCodeMessage => {
         document.getElementById(inputId).value = qrCodeMessage;
         stopScanner();
+
+        // Si escaneamos el alumno, abrimos automáticamente escáner del libro
+        if(inputId === "alumnoInput") {
+          setTimeout(() => {
+            startScanner("libroInput");
+          }, 500);
+        }
       },
       errorMessage => {}
     ).catch(err => {
@@ -417,16 +451,9 @@
 
   document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
 
-  // Ejecutar al cargar la página
   window.onload = () => {
     cargarSesion();
     cargarPrestamosDesdeSheets();
-    // Búsqueda con Enter
-    document.getElementById("busqueda").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        buscar();
-      }
-    });
   };
 </script>
 
