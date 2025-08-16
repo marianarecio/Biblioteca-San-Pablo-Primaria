@@ -220,10 +220,7 @@
    </button>
   </div>
   <div>
-   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly="" type="text"/>
-   <button id="btnAlumnoScan" onclick="startScanner('alumnoInput')">
-    📷
-   </button>
+   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly type="text" onclick="startScanner('alumnoInput')"/>
   </div>
   <div>
    <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
@@ -340,7 +337,7 @@
       return;
     }
    const ahora = new Date();
-const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+   const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
     const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
 
     prestamosSesion.push(nuevoPrestamo);
@@ -470,11 +467,11 @@ const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString
   }
 
   document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
-document.getElementById("busqueda").addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
-    buscar();
-  }
-});
+  document.getElementById("busqueda").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      buscar();
+    }
+  });
 
   window.onload = () => {
     cargarSesion();
