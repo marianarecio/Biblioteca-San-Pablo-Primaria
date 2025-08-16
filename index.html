@@ -41,8 +41,7 @@
 
   <div class="section" id="responsableSection">
     <h3>Escanear código del responsable</h3>
-    <button id="btnIniciarEscaneo" onclick="iniciarScanner()">Escanear Responsable</button>
-    <div id="reader" style="display: none;"></div>
+    <div id="reader" style="display: block;"></div>
   </div>
 
   <div class="section" id="registroSection" style="display: none;">
@@ -93,9 +92,6 @@
     const html5QrCode = new Html5Qrcode("reader");
 
     function iniciarScanner() {
-      document.getElementById("btnIniciarEscaneo").style.display = "none";
-      document.getElementById("reader").style.display = "block";
-
       Html5Qrcode.getCameras().then(cameras => {
         if (cameras && cameras.length) {
           html5QrCode.start(
@@ -125,7 +121,7 @@
         libro = decodedText;
         document.getElementById("libro").value = libro;
         registrarPrestamo();
-        estado = "alumno";
+        estado = "alumno"; // Volver a esperar un nuevo alumno
         document.getElementById("alumno").value = "";
         document.getElementById("libro").value = "";
       }
@@ -187,6 +183,8 @@
       document.getElementById("alumno").value = "";
       document.getElementById("libro").value = "";
     }
+
+    window.onload = iniciarScanner;
   </script>
 
 </body>
