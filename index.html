@@ -219,18 +219,16 @@
     📷
    </button>
   </div>
-  <div>
-   <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly="" type="text"/>
-   <button id="btnAlumnoScan" onclick="startScanner('alumnoInput')">
-    📷
-   </button>
-  </div>
-  <div>
-   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
-   <button id="btnLibroScan" onclick="startScanner('libroInput')">
-    📷
-   </button>
-  </div>
+  <div class="formulario">
+  <label for="alumnoInput">Escaneá el QR del alumno:</label>
+  <input type="text" id="alumnoInput" placeholder="Alumno" readonly/>
+
+  <label for="libroInput">Escaneá el QR del libro:</label>
+  <input type="text" id="libroInput" placeholder="Libro" readonly/>
+
+  <button onclick="registrarPrestamo()">Registrar Préstamo</button>
+</div>
+
   <button id="registrarBtn" onclick="registrarPrestamo()" style="background-color:#4a4e69;">
     Registrar Pr&eacute;stamo
   </button>
