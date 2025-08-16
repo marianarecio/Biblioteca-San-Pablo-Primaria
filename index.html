@@ -45,7 +45,6 @@
       background-color: #f2e9e4;
       box-shadow: 0 0 15px rgba(0,0,0,0.3);
       position: relative;
-      overflow: hidden;
     }
     #scanner video {
       width: 100% !important;
@@ -395,82 +394,58 @@
     contenedor.innerHTML = html;
   }
 
-  // Mejoras para escáner QR con texto "Cargando cámara..."
+  // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
   let currentScanner = null;
-
   function startScanner(inputId) {
+    if (currentScanner) {
+      currentScanner.clear().then(() => {
+        document.getElementById("scannerModal").style.display = "none";
+      });
+    }
     const scannerModal = document.getElementById("scannerModal");
-    const scannerDiv = document.getElementById("scanner");
-
     scannerModal.style.display = "flex";
     scannerModal.dataset.inputId = inputId;
 
-    scannerDiv.innerHTML = `<div id="loadingText" style="
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 12px 24px;
-      border-radius: 12px;
-      color: #004080;
-      font-weight: 700;
-      font-size: 1.3em;
-      user-select: none;
-      z-index: 2000;
-      box-shadow: 0 0 6px rgba(0, 64, 128, 0.7);
-    ">Cargando cámara...</div>`;
+    const scannerDiv = document.getElementById("scanner");
+    scannerDiv.innerHTML = "";
 
-    if (currentScanner) {
-      currentScanner.clear().then(() => {
-        currentScanner = null;
-        iniciarEscaner();
-      }).catch(() => {
-        currentScanner = null;
-        iniciarEscaner();
-      });
-    } else {
-      iniciarEscaner();
-    }
+    currentScanner = new Html5Qrcode("scanner");
 
-    function iniciarEscaner() {
-      currentScanner = new Html5Qrcode("scanner");
+    currentScanner.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: { width: 280, height: 280 }
+      },
+      qrCodeMessage => {
+        document.getElementById(inputId).value = qrCodeMessage;
 
-      currentScanner.start(
-        { facingMode: "environment" },
-        {
-          fps: 10,
-          qrbox: { width: 280, height: 280 }
-        },
-        qrCodeMessage => {
-          document.getElementById(inputId).value = qrCodeMessage;
+        // Actualizo responsableActual si es responsableInput
+        if(inputId === "responsableInput") {
+          responsableActual = qrCodeMessage;
+          sessionStorage.setItem("responsableActual", responsableActual);
+          // Bloqueo input y botón responsable
+          const respInput = document.getElementById("responsableInput");
+          respInput.setAttribute("readonly", true);
+          const btnResp = document.getElementById("btnResponsableScan");
+          btnResp.disabled = true;
+          btnResp.style.opacity = 0.5;
+        }
 
-          if(inputId === "responsableInput") {
-            responsableActual = qrCodeMessage;
-            sessionStorage.setItem("responsableActual", responsableActual);
-            document.getElementById("responsableInput").setAttribute("readonly", true);
-            const btnResp = document.getElementById("btnResponsableScan");
-            btnResp.disabled = true;
-            btnResp.style.opacity = 0.5;
-          }
-
-          stopScanner();
-
-          if(inputId === "alumnoInput") {
-            setTimeout(() => {
-              startScanner("libroInput");
-            }, 3000);
-          }
-        },
-        errorMessage => {}
-      ).then(() => {
-        const loadingText = document.getElementById("loadingText");
-        if(loadingText) loadingText.style.display = "none";
-      }).catch(err => {
-        alert("No se pudo acceder a la cámara");
         stopScanner();
-      });
-    }
+
+        // Si escaneamos el alumno, abrimos automáticamente escáner del libro
+        if(inputId === "alumnoInput") {
+          setTimeout(() => {
+            startScanner("libroInput");
+          }, 3000);  // 3 segundos de espera antes de abrir escáner del libro
+        }
+      },
+      errorMessage => {}
+    ).catch(err => {
+      alert("No se pudo acceder a la cámara");
+      stopScanner();
+    });
   }
 
   function stopScanner() {
