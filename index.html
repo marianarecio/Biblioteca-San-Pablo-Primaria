@@ -111,6 +111,7 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      cursor: pointer; /* Para indicar que se puede clicar */
     }
     #resultadosBusqueda {
       margin: 30px auto;
@@ -223,10 +224,7 @@
    <input id="alumnoInput" placeholder="Escane&aacute; el QR del alumno" readonly type="text" onclick="startScanner('alumnoInput')"/>
   </div>
   <div>
-   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly="" type="text"/>
-   <button id="btnLibroScan" onclick="startScanner('libroInput')">
-    📷
-   </button>
+   <input id="libroInput" placeholder="Escane&aacute; el QR del libro" readonly type="text" onclick="startScanner('libroInput')"/>
   </div>
   <button id="registrarBtn" onclick="registrarPrestamo()" style="background-color:#4a4e69;">
     Registrar Pr&eacute;stamo
