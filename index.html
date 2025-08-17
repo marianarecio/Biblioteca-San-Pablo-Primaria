@@ -82,9 +82,9 @@
       background-color: #87b2f2;
     }
     table {
-      margin: 20px auto;
+      margin: 0 auto 20px auto; /* margen arriba y abajo, centrado horizontal */
       border-collapse: collapse;
-      width: 90%;
+      width: 100%;
       max-width: 600px;
       background-color: #ffffff;
       border-radius: 12px;
@@ -303,26 +303,28 @@
   <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">
    📋 Pr&eacute;stamos Registrados
   </h2>
-  <table>
-   <thead>
-    <tr>
-     <th>
-      Responsable
-     </th>
-     <th>
-      Libro
-     </th>
-     <th>
-      Alumno
-     </th>
-     <th>
-      Fecha
-     </th>
-    </tr>
-   </thead>
-   <tbody id="prestamosTable">
-   </tbody>
-  </table>
+  <div style="text-align: center;">
+    <table>
+     <thead>
+      <tr>
+       <th>
+        Responsable
+       </th>
+       <th>
+        Libro
+       </th>
+       <th>
+        Alumno
+       </th>
+       <th>
+        Fecha
+       </th>
+      </tr>
+     </thead>
+     <tbody id="prestamosTable">
+     </tbody>
+    </table>
+  </div>
 
   <div class="search-box">
    <h3>
@@ -494,53 +496,55 @@
         if(inputId === "responsableInput") {
           responsableActual = qrCodeMessage;
           sessionStorage.setItem("responsableActual", responsableActual);
-          // Bloqueo input responsable para evitar cambios hasta recarga
-          const respInput = document.getElementById("responsableInput");
-          respInput.setAttribute("readonly", true);
+          document.getElementById("responsableInput").setAttribute("readonly", true);
         }
 
-        stopScanner();
+        // Después de escanear responsable, se cierra el scanner automáticamente
+        if(inputId === "responsableInput") {
+          stopScanner();
+          return;
+        }
 
-        // Si escaneamos el alumno, abrimos automáticamente escáner del libro
+        // Después de escanear alumno, no cerrar scanner y cambiar a libro
         if(inputId === "alumnoInput") {
-          setTimeout(() => {
-            startScanner("libroInput");
-          }, 1000);  // 1 segundos de espera antes de abrir escáner del libro
+          stopScanner().then(() => {
+            startScanner('libroInput');
+          });
+          return;
+        }
+
+        // Después de escanear libro, cerramos scanner automáticamente
+        if(inputId === "libroInput") {
+          stopScanner();
+          return;
         }
       },
-      errorMessage => {}
+      errorMessage => {
+        //console.log("No QR detected");
+      }
     ).catch(err => {
-      alert("No se pudo acceder a la cámara");
-      stopScanner();
+      alert("Error al iniciar la cámara para escaneo: " + err);
     });
   }
 
   function stopScanner() {
-    if (currentScanner) {
-      currentScanner.stop().then(() => {
-        currentScanner.clear();
-        currentScanner = null;
-        document.getElementById("scannerModal").style.display = "none";
-      }).catch((e) => {
-        console.error("Error deteniendo el escáner:", e);
-      });
-    } else {
+    if (!currentScanner) return Promise.resolve();
+    return currentScanner.stop().then(() => {
+      currentScanner.clear();
       document.getElementById("scannerModal").style.display = "none";
-    }
+      currentScanner = null;
+    });
   }
 
-  document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
-  document.getElementById("busqueda").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      buscar();
-    }
+  document.getElementById("closeScannerBtn").addEventListener("click", () => {
+    stopScanner();
   });
 
-  window.onload = () => {
-    cargarSesion();
-    cargarPrestamosDesdeSheets();
+  window.onload = function() {
+    cargarPrestamosDesdeSheets().then(() => {
+      cargarSesion();
+    });
   };
 </script>
-
  </body>
 </html>
