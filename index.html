@@ -207,17 +207,6 @@
         align-items: flex-start;
         padding-top: 60px;
       }
-    #busqueda {
-  width: 80%;
-  max-width: 400px;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  cursor: text;
-}
 #busqueda {
   width: 80%;
   max-width: 400px;
@@ -258,15 +247,7 @@
   </div>
 </div>
 
-<script>
-  function abrirInstrucciones() {
-    document.getElementById("modalInstrucciones").style.display = "flex";
-  }
 
-  function cerrarInstrucciones() {
-    document.getElementById("modalInstrucciones").style.display = "none";
-  }
-</script>
  <body>
   <!-- Imagen escudo en el encabezado -->
   <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
@@ -280,7 +261,15 @@
   <div style="margin-top: 10px;">
     <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
   </div>
+<script>
+  function abrirInstrucciones() {
+    document.getElementById("modalInstrucciones").style.display = "flex";
+  }
 
+  function cerrarInstrucciones() {
+    document.getElementById("modalInstrucciones").style.display = "none";
+  }
+</script>
   <div class="input-with-icon" onclick="startScanner('responsableInput')">
     <input id="responsableInput" placeholder="Escaneá el QR del responsable" readonly type="text" />
     <span class="icon-camera">📷</span>
@@ -413,32 +402,57 @@
     alert("¡Devolución registrada!");
   }
 
- function registrarPrestamo(alumno, libro, accion = "prestamo") {
-  const responsable = responsableActual;
-  const fecha = obtenerFechaHora();
-  const datos = {
-    responsable: responsable,
-    alumno: alumno,
-    libro: libro,
-    fecha: fecha,
-    accion: accion
-  };
-
-  fetch(scriptURL, {
-    method: 'POST',
-    body: JSON.stringify(datos),
-    headers: {
-      'Content-Type': 'application/json'
+  function registrarPrestamo() {
+    if(devolviendo) {
+      alert("Por favor, terminá la devolución escaneando el libro.");
+      return;
     }
-  })
-  .then(response => {
-    if (accion === "prestamo") {
-      prestamosDelDia.push(datos);
-      actualizarTablaPrestamos();
-    }
-  });
-}
 
+    if(!responsableActual) {
+      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
+      return;
+    }
+    const libro = document.getElementById('libroInput').value.trim();
+    const alumno = document.getElementById('alumnoInput').value.trim();
+    if (!libro || !alumno) {
+      alert("Escaneá primero el código QR del alumno y del libro");
+      return;
+    }
+   const ahora = new Date();
+   const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
+
+    prestamosSesion.push(nuevoPrestamo);
+    prestamos.push(nuevoPrestamo);
+    guardarSesion();
+    actualizarTabla();
+
+    document.getElementById('libroInput').value = "";
+    document.getElementById('alumnoInput').value = "";
+
+    fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(nuevoPrestamo)
+    });
+
+    alert("¡Préstamo registrado!");
+  }
+
+  function actualizarTabla() {
+    const tabla = document.getElementById("prestamosTable");
+    tabla.innerHTML = "";
+    prestamosSesion.forEach(p => {
+      const fila = tabla.insertRow();
+      fila.insertCell(0).textContent = p.responsable;
+      fila.insertCell(1).textContent = p.libro;
+      fila.insertCell(2).textContent = p.alumno;
+      fila.insertCell(3).textContent = p.fecha;
+    });
+  }
 
   function buscar() {
     const consulta = document.getElementById("busqueda").value.toLowerCase().trim();
@@ -622,30 +636,6 @@
       stopScanner();
     });
   }
-function actualizarTablaPrestamos() {
-  const cuerpoTabla = document.getElementById("tablaPrestamos");
-  cuerpoTabla.innerHTML = "";
-  
-  prestamosDelDia
-    .filter(p => p.accion === "prestamo") // ✅ mostrar solo préstamos
-    .forEach(p => {
-      const fila = document.createElement("tr");
-      fila.innerHTML = `
-        <td>${p.responsable}</td>
-        <td>${p.alumno}</td>
-        <td>${p.libro}</td>
-        <td>${p.fecha}</td>
-      `;
-      cuerpoTabla.appendChild(fila);
-    });
-}
-function estadoLibro(nombreLibro) {
-  const prestamosDelLibro = todosLosRegistros.filter(p => p.libro === nombreLibro);
-  if (prestamosDelLibro.length === 0) return "Disponible";
-
-  const ultimo = prestamosDelLibro[prestamosDelLibro.length - 1];
-  return ultimo.accion === "devolucion" ? "Disponible" : "Prestado";
-}
 
   function stopScanner() {
     if (currentScanner) {
