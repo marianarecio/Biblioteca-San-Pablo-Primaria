@@ -288,7 +288,7 @@
             const alumno = qrCodeMessage;
             document.getElementById("alumnoInput").value = alumno;
 
-            // Aquí chequeamos si el alumno tiene préstamo activo sin devolución
+            // Revisión préstamo activo sin devolución:
             const prestamosActivos = prestamos.filter(p =>
               p.alumno === alumno &&
               p.tipo === "prestamo" &&
@@ -296,24 +296,24 @@
             );
 
             if (prestamosActivos.length > 0) {
-              alert("El alumno ya tiene un libro prestado. Escaneá ahora el libro que va a devolver.");
+              alert("El alumno ya tiene un libro prestado. Ahora escaneá el libro que va a devolver.");
 
-              // Forzamos a escanear devolución
+              // Esperamos para escanear devolución
               setTimeout(() => {
                 startScanner("libroInput");
 
-                // Capturamos el siguiente escaneo para devolución
+                // Reasignamos la función onScanSuccess para devolución
                 currentScanner.onScanSuccess = libroDevuelto => {
                   document.getElementById("libroInput").value = libroDevuelto;
                   stopScanner();
                   registrarDevolucion(alumno, libroDevuelto);
 
-                  // Luego permitimos escanear el libro nuevo para préstamo
+                  // Luego permitimos escanear el libro para nuevo préstamo
                   setTimeout(() => startScanner("libroInput"), 800);
                 };
               }, 500);
             } else {
-              // Si no hay préstamos activos, seguimos con préstamo normal
+              // Sin préstamos activos, seguir normal
               setTimeout(() => startScanner("libroInput"), 500);
             }
             return;
