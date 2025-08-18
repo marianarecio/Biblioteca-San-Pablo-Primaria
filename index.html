@@ -207,66 +207,44 @@
         align-items: flex-start;
         padding-top: 60px;
       }
+    }
     #busqueda {
-  width: 80%;
-  max-width: 400px;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  cursor: text;
-}
-#busqueda {
-  width: 80%;
-  max-width: 400px;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-  cursor: text;
-}
-.estilo-busqueda {
-  width: 80%;
-  max-width: 400px;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  background-color: white;
-  color: #333;
-  text-align: left;
-}
-
+      width: 80%;
+      max-width: 400px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      cursor: text;
+    }
+    #busqueda {
+      width: 80%;
+      max-width: 400px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      cursor: text;
+    }
+    .estilo-busqueda {
+      width: 80%;
+      max-width: 400px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      background-color: white;
+      color: #333;
+      text-align: left;
+    }
   </style>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
  </head>
-<!-- Modal de instrucciones -->
-<div id="modalInstrucciones" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
-  <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; width: 400px; text-align: left; position: relative; font-family: 'Jost', sans-serif;">
-    <button onclick="cerrarInstrucciones()" style="position: absolute; top: 10px; right: 10px; background: #e57373; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer;">×</button>
-    <h2 style="margin-top: 0;">📖 Instrucciones</h2>
-    <p style="font-size: 1em; line-height: 1.6;">
-      Escaneá primero el código QR del <strong>responsable</strong> para iniciar sesión.<br/><br/>
-      Luego, escaneá el código QR del <strong>alumno</strong> y el del <strong>libro</strong> para registrar un préstamo.<br/><br/>
-      El código del responsable se mantendrá durante toda la sesión.
-    </p>
-  </div>
-</div>
-
-<script>
-  function abrirInstrucciones() {
-    document.getElementById("modalInstrucciones").style.display = "flex";
-  }
-
-  function cerrarInstrucciones() {
-    document.getElementById("modalInstrucciones").style.display = "none";
-  }
-</script>
  <body>
   <!-- Imagen escudo en el encabezado -->
   <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
@@ -331,14 +309,10 @@
    <label class="search-label" for="busqueda">
     Buscar por libro o alumno
    </label>
-<input id="busqueda" placeholder="Ej: LIB001, ALU001, título o nombre" type="text"
- style="width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; background-color: white; color: #333; text-align: left;"/>
-   <button onclick="buscar()">
-    Buscar
-   </button>
+   <input id="busqueda" placeholder="Ej: LIB001, ALU001, título o nombre" type="text"/>
+   <button onclick="buscar()">Buscar</button>
   </div>
-  <div id="resultadosBusqueda">
-  </div>
+  <div id="resultadosBusqueda"></div>
 
   <!-- Modal con el escáner -->
   <div id="scannerModal">
@@ -346,28 +320,78 @@
     <button id="closeScannerBtn" title="Cerrar escáner">×</button>
   </div>
 
+  <!-- Modal de instrucciones -->
+  <div id="modalInstrucciones" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; width: 400px; text-align: left; position: relative; font-family: 'Jost', sans-serif;">
+      <button onclick="cerrarInstrucciones()" style="position: absolute; top: 10px; right: 10px; background: #e57373; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer;">×</button>
+      <h2 style="margin-top: 0;">📖 Instrucciones</h2>
+      <p style="font-size: 1em; line-height: 1.6;">
+        Escaneá primero el código QR del <strong>responsable</strong> para iniciar sesión.<br/><br/>
+        Luego, escaneá el código QR del <strong>alumno</strong> y el del <strong>libro</strong> para registrar un préstamo.<br/><br/>
+        El código del responsable se mantendrá durante toda la sesión.
+      </p>
+    </div>
+  </div>
+
 <script>
   const SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPaECJsngiyD9uGGUzbbbXJ7URfcN4Is3zMquANdGwKCcb9uwAcK9BloA0M0dHVmg6cg/exec";
 
-  let prestamos = [];         
-  let prestamosSesion = [];   
-  let responsableActual = null;  // Guardo el responsable escaneado para la sesión
-  let devolviendo = false;      // <-- Estado para controlar si estamos en proceso de devolución
+  let prestamos = [];       // Todos los registros de la hoja (préstamos + devoluciones)
+  let prestamosSesion = []; // Sólo los préstamos activos de la sesión actual (sin devoluciones)
+  let responsableActual = null;
+  let html5QrScanner = null;
+  let campoActualEscaneo = null;
 
+  // Cargar datos desde Google Sheets al iniciar la página
   async function cargarPrestamosDesdeSheets() {
     try {
       const response = await fetch(SHEETS_WEBHOOK_URL);
       if (!response.ok) throw new Error("Error al cargar datos");
       const data = await response.json();
+      // Mapeamos los datos para trabajar
       prestamos = data.map(item => ({
         responsable: item.Responsable,
         alumno: item.Alumno,
         libro: item.Libro,
         fecha: item.Fecha,
+        tipo: item.Tipo || "prestamo" // Debe haber una columna "Tipo" para distinguir préstamo/devolución
       }));
+      // Actualizamos los préstamos activos (prestamosSesion) filtrando los que no tienen devolución
+      actualizarPrestamosSesion();
+      actualizarTabla();
     } catch (error) {
       console.error("No se pudieron cargar los préstamos:", error);
     }
+  }
+
+  // Actualiza prestamosSesion sólo con los préstamos que no hayan sido devueltos
+  function actualizarPrestamosSesion() {
+    // Filtrar prestamos de tipo préstamo
+    const prestamosSolo = prestamos.filter(p => p.tipo === "prestamo");
+
+    // Filtrar devoluciones
+    const devoluciones = prestamos.filter(p => p.tipo === "devolucion");
+
+    // Excluir préstamos que tengan una devolución posterior (por libro y alumno)
+    prestamosSesion = prestamosSolo.filter(prestamo => {
+      return !devoluciones.some(dev => 
+        dev.libro.toLowerCase() === prestamo.libro.toLowerCase() &&
+        dev.alumno.toLowerCase() === prestamo.alumno.toLowerCase() &&
+        compararFechas(dev.fecha, prestamo.fecha) > 0 // Devolución posterior al préstamo
+      );
+    });
+  }
+
+  // Compara dos fechas en formato "dd/mm/yyyy hh:mm"
+  // Retorna >0 si f1>f2, <0 si f1<f2, 0 si iguales
+  function compararFechas(f1, f2) {
+    const parseFecha = f => {
+      const [datePart, timePart] = f.split(" ");
+      const [dd, mm, yyyy] = datePart.split("/");
+      const [hh, mi] = timePart.split(":");
+      return new Date(yyyy, mm -1, dd, hh, mi);
+    };
+    return parseFecha(f1) - parseFecha(f2);
   }
 
   function guardarSesion() {
@@ -387,19 +411,127 @@
     if(responsableGuardado) {
       responsableActual = responsableGuardado;
       document.getElementById("responsableInput").value = responsableActual;
-      // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
       document.getElementById("responsableInput").setAttribute("readonly", true);
     }
   }
 
-  // --- Función para registrar devolución ---
-  function registrarDevolucion(alumno, libro) {
+  // Función para iniciar el escáner y asociarlo al input que se clickeó
+  function startScanner(campoId) {
+    campoActualEscaneo = campoId;
+    document.getElementById("scannerModal").style.display = "flex";
+
+    if (html5QrScanner) {
+      html5QrScanner.clear().then(() => {
+        iniciarScanner();
+      }).catch(err => {
+        console.error("Error limpiando scanner:", err);
+      });
+    } else {
+      iniciarScanner();
+    }
+  }
+
+  // Inicializa el escáner con la cámara trasera
+  function iniciarScanner() {
+    const config = { fps: 10, qrbox: 250 };
+    html5QrScanner = new Html5Qrcode("scanner");
+    html5QrScanner.start(
+      { facingMode: "environment" },
+      config,
+      qrCodeMessage => {
+        // Al detectar QR, poner valor en el input correspondiente
+        if(campoActualEscaneo){
+          document.getElementById(campoActualEscaneo).value = qrCodeMessage;
+          // Si es responsable, fijarlo y bloquear edición
+          if(campoActualEscaneo === "responsableInput"){
+            responsableActual = qrCodeMessage;
+            document.getElementById("responsableInput").setAttribute("readonly", true);
+          }
+          // Después de escanear, cerramos scanner automáticamente
+          stopScanner();
+        }
+      },
+      errorMessage => {
+        // console.log("Error QR:", errorMessage);
+      }
+    ).catch(err => {
+      console.error("No se pudo iniciar la cámara:", err);
+      alert("No se pudo acceder a la cámara o no está disponible.");
+      stopScanner();
+    });
+  }
+
+  // Detiene el escáner y oculta el modal
+  function stopScanner() {
+    if (html5QrScanner) {
+      html5QrScanner.stop().then(() => {
+        html5QrScanner.clear();
+        html5QrScanner = null;
+      }).catch(err => {
+        console.error("Error deteniendo scanner:", err);
+      });
+    }
+    document.getElementById("scannerModal").style.display = "none";
+  }
+
+  // Evento botón cerrar scanner
+  document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
+
+  // Registrar préstamo
+  function registrarPrestamo() {
+    if(!responsableActual) {
+      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
+      return;
+    }
+    const libro = document.getElementById('libroInput').value.trim();
+    const alumno = document.getElementById('alumnoInput').value.trim();
+    if (!libro || !alumno) {
+      alert("Escaneá primero el código QR del alumno y del libro");
+      return;
+    }
+    // Antes de registrar, verificar si el libro está prestado y no devuelto
+    if(estadoLibro(libro) === "Prestado"){
+      alert("El libro ya está prestado. Primero debe devolverse para poder prestar nuevamente.");
+      return;
+    }
+
     const ahora = new Date();
     const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    const devolucion = { responsable: responsableActual, libro, alumno, fecha };
 
-    prestamosSesion.push(devolucion);
+    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha, tipo: "prestamo" };
+    prestamos.push(nuevoPrestamo);
+    prestamosSesion.push(nuevoPrestamo);
+    guardarSesion();
+    actualizarTabla();
+
+    // Limpiar inputs libro y alumno para nuevo registro
+    document.getElementById('libroInput').value = "";
+    document.getElementById('alumnoInput').value = "";
+
+    // Enviar al webhook
+    fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevoPrestamo)
+    });
+
+    alert("¡Préstamo registrado!");
+  }
+
+  // Registrar devolución
+  function registrarDevolucion(libro, alumno) {
+    if(!responsableActual) {
+      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
+      return;
+    }
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+
+    const devolucion = { responsable: responsableActual, libro, alumno, fecha, tipo: "devolucion" };
     prestamos.push(devolucion);
+    // Actualizamos prestamosSesion para remover ese préstamo devuelto
+    actualizarPrestamosSesion();
     guardarSesion();
     actualizarTabla();
 
@@ -413,46 +545,7 @@
     alert("¡Devolución registrada!");
   }
 
-  function registrarPrestamo() {
-    if(devolviendo) {
-      alert("Por favor, terminá la devolución escaneando el libro.");
-      return;
-    }
-
-    if(!responsableActual) {
-      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
-      return;
-    }
-    const libro = document.getElementById('libroInput').value.trim();
-    const alumno = document.getElementById('alumnoInput').value.trim();
-    if (!libro || !alumno) {
-      alert("Escaneá primero el código QR del alumno y del libro");
-      return;
-    }
-   const ahora = new Date();
-   const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
-
-    prestamosSesion.push(nuevoPrestamo);
-    prestamos.push(nuevoPrestamo);
-    guardarSesion();
-    actualizarTabla();
-
-    document.getElementById('libroInput').value = "";
-    document.getElementById('alumnoInput').value = "";
-
-    fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(nuevoPrestamo)
-    });
-
-    alert("¡Préstamo registrado!");
-  }
-
+  // Actualiza la tabla de préstamos activos (sin devoluciones)
   function actualizarTabla() {
     const tabla = document.getElementById("prestamosTable");
     tabla.innerHTML = "";
@@ -465,215 +558,95 @@
     });
   }
 
+  // Determina el estado actual de un libro: "Disponible" o "Prestado"
+  function estadoLibro(libro) {
+    // Filtrar registros por ese libro
+    const registrosLibro = prestamos.filter(p => p.libro.toLowerCase() === libro.toLowerCase());
+    if(registrosLibro.length === 0) return "Disponible";
+
+    // Ordenar por fecha ascendente
+    registrosLibro.sort((a,b) => compararFechas(a.fecha, b.fecha));
+
+    // La última acción determina si está prestado o devuelto
+    const ultimoRegistro = registrosLibro[registrosLibro.length - 1];
+    return (ultimoRegistro.tipo === "prestamo") ? "Prestado" : "Disponible";
+  }
+
+  // Función de búsqueda (por libro o alumno)
   function buscar() {
-    const consulta = document.getElementById("busqueda").value.toLowerCase().trim();
-    if (!consulta) {
-      document.getElementById("resultadosBusqueda").innerHTML = "";
+    const query = document.getElementById("busqueda").value.trim().toLowerCase();
+    const resultadosDiv = document.getElementById("resultadosBusqueda");
+    resultadosDiv.innerHTML = "";
+
+    if(!query) {
+      resultadosDiv.textContent = "Por favor, ingrese un término para buscar.";
       return;
     }
+
+    // Filtrar prestamos que coincidan con alumno o libro
     const resultados = prestamos.filter(p =>
-      p.libro.toLowerCase().includes(consulta) || p.alumno.toLowerCase().includes(consulta)
+      p.libro.toLowerCase().includes(query) ||
+      p.alumno.toLowerCase().includes(query)
     );
-    mostrarResultados("Búsqueda", consulta, resultados);
-  }
 
-  function mostrarResultados(tipo, consulta, resultados) {
-    const contenedor = document.getElementById("resultadosBusqueda");
-    if (resultados.length === 0) {
-      contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
+    if(resultados.length === 0){
+      resultadosDiv.textContent = "No se encontraron registros.";
       return;
     }
-    let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
-    resultados.forEach(p => {
-      html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
+
+    // Crear tabla resultados
+    const tabla = document.createElement("table");
+    tabla.style.width = "100%";
+    tabla.style.borderCollapse = "collapse";
+
+    // Cabecera
+    const thead = document.createElement("thead");
+    const filaHead = document.createElement("tr");
+    ["Responsable", "Libro", "Alumno", "Fecha", "Tipo", "Estado"].forEach(texto => {
+      const th = document.createElement("th");
+      th.textContent = texto;
+      th.style.border = "1px solid #ddd";
+      th.style.padding = "8px";
+      th.style.backgroundColor = "#c9daf8";
+      filaHead.appendChild(th);
     });
-    html += "</ul>";
-    contenedor.innerHTML = html;
-  }
+    thead.appendChild(filaHead);
+    tabla.appendChild(thead);
 
-  // --- NUEVO: función para verificar si alumno tiene préstamo activo ---
-  function tienePrestamoActivo(alumno) {
-    // Consideramos préstamo activo si existe un préstamo sin que haya sido devuelto (es decir, no hay devolución con mismo libro+alumno después)
-    // Para simplificar, asumimos que el último registro para ese libro y alumno indica estado:
-    // - Si último registro para ese libro y alumno es un préstamo => está activo
-    // - Si último registro es devolución => no está activo
-    // Asumimos que las devoluciones también se guardan como registros con mismo formato.
+    // Cuerpo
+    const tbody = document.createElement("tbody");
+    resultados.forEach(r => {
+      const fila = document.createElement("tr");
 
-    // Busco todos los registros para alumno
-    const prestamosAlumno = prestamos
-      .filter(p => p.alumno === alumno);
+      const estado = estadoLibro(r.libro);
 
-    // Ordeno por fecha ascendente para determinar estado final
-    // Asumo que fecha es string, la convierto a Date para comparar
-    prestamosAlumno.sort((a,b) => {
-      // Asumo formato: "dd/mm/yyyy hh:mm"
-      const parseFecha = (f) => {
-        const [datePart,timePart] = f.split(" ");
-        const [dd,mm,yyyy] = datePart.split("/");
-        const [hh,mi] = timePart.split(":");
-        return new Date(yyyy, mm-1, dd, hh, mi);
-      };
-      return parseFecha(a.fecha) - parseFecha(b.fecha);
-    });
-
-    // Recorro registros y verifico el estado último del libro(s) del alumno
-    // Si el último registro para libro es préstamo -> activo, si devolución -> no activo
-    // Entonces busco los libros prestados y si hay alguno sin devolución
-
-    // Para cada libro que el alumno tiene en préstamos, verifico si la última acción fue préstamo o devolución
-
-    // Obtener libros distintos que el alumno tiene
-    const librosAlumno = [...new Set(prestamosAlumno.map(p => p.libro))];
-
-    for (const libro of librosAlumno) {
-      // Filtro registros para ese libro
-      const registrosLibro = prestamosAlumno.filter(p => p.libro === libro);
-
-      // Último registro para libro
-      const ultimoRegistro = registrosLibro[registrosLibro.length -1];
-
-      // Para distinguir préstamo vs devolución: asumimos que
-      // Préstamo: registro creado con alumno+libro, devolución: mismo alumno+libro pero se registra cuando devuelve
-      // Si no se registran de forma explícita diferente, podemos usar una marca.
-      // Como no hay marca, vamos a asumir que cuando se registra un préstamo nuevo con mismo alumno y libro, es préstamo, y cuando se registra una devolución, también con mismo alumno y libro, es devolución.
-      // Pero no hay campo para distinguir.
-
-      // Para diferenciar, usamos un truco: si hay más de una entrada para ese libro y alumno, la última entrada es:
-      // - devolución si el número de registros es par (préstamo + devolución)
-      // - préstamo si es impar (único préstamo sin devolución)
-
-      // O mejor: cada registro nuevo con mismo alumno y libro es alternadamente préstamo o devolución.
-
-      // Por eso, si la cantidad de registros para libro es impar, hay un préstamo activo
-      if(registrosLibro.length % 2 === 1) {
-        return true; // tiene préstamo activo
-      }
-    }
-
-    return false; // no tiene préstamo activo
-  }
-
-  // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
-  let currentScanner = null;
-  function startScanner(inputId) {
-    if (currentScanner) {
-      currentScanner.clear().then(() => {
-        document.getElementById("scannerModal").style.display = "none";
+      [r.responsable, r.libro, r.alumno, r.fecha, r.tipo, estado].forEach(texto => {
+        const td = document.createElement("td");
+        td.textContent = texto;
+        td.style.border = "1px solid #ddd";
+        td.style.padding = "8px";
+        td.style.textAlign = "center";
+        fila.appendChild(td);
       });
-    }
-    const scannerModal = document.getElementById("scannerModal");
-    scannerModal.style.display = "flex";
-    scannerModal.dataset.inputId = inputId;
-
-    const scannerDiv = document.getElementById("scanner");
-    scannerDiv.innerHTML = "";
-
-    currentScanner = new Html5Qrcode("scanner");
-
-    currentScanner.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: { width: 280, height: 280 }
-      },
-      qrCodeMessage => {
-        // --- NUEVO: lógica especial para escanear alumno y controlar devolución ---
-        if(inputId === "alumnoInput") {
-          // Si ya estamos en modo devolución, ignoramos porque debe escanear libro
-          if(devolviendo) {
-            alert("Primero escaneá el libro para devolver.");
-            return;
-          }
-          document.getElementById(inputId).value = qrCodeMessage;
-          const alumnoEscaneado = qrCodeMessage.trim();
-
-          // Verifico si tiene préstamo activo
-          if(tienePrestamoActivo(alumnoEscaneado)) {
-            devolviendo = true; // activo modo devolución
-            alert("El alumno tiene préstamos activos. Por favor, escaneá el libro para devolver antes de hacer un nuevo préstamo.");
-            stopScanner();
-            // Abrir escáner para libro para devolución
-            setTimeout(() => startScanner("libroInput"), 500);
-            return;
-          } else {
-            // No tiene préstamo activo, paso a escanear libro para nuevo préstamo
-            stopScanner();
-            setTimeout(() => startScanner("libroInput"), 500);
-            return;
-          }
-        }
-
-        // Cuando escaneamos libro:
-        if(inputId === "libroInput") {
-          const libroEscaneado = qrCodeMessage.trim();
-          document.getElementById(inputId).value = libroEscaneado;
-
-          if(devolviendo) {
-            // Estamos en modo devolución: registrar devolución del libro para el alumno que está en alumnoInput
-            const alumnoActual = document.getElementById("alumnoInput").value.trim();
-            registrarDevolucion(alumnoActual, libroEscaneado);
-
-            devolviendo = false;
-
-            // Limpio inputs libro y alumno para nuevo préstamo
-            document.getElementById("libroInput").value = "";
-            document.getElementById("alumnoInput").value = "";
-
-            // Abrir escáner para alumno para nuevo préstamo
-            stopScanner();
-            setTimeout(() => startScanner("alumnoInput"), 500);
-            return;
-          } else {
-            // Si no estamos en devolución, solo ponemos el valor y cerramos escáner
-            stopScanner();
-            return;
-          }
-        }
-
-        // Cuando escaneamos responsable
-        if(inputId === "responsableInput") {
-          responsableActual = qrCodeMessage.trim();
-          sessionStorage.setItem("responsableActual", responsableActual);
-          document.getElementById("responsableInput").value = responsableActual;
-          document.getElementById("responsableInput").setAttribute("readonly", true);
-          stopScanner();
-          return;
-        }
-
-      },
-      errorMessage => {}
-    ).catch(err => {
-      alert("No se pudo acceder a la cámara");
-      stopScanner();
+      tbody.appendChild(fila);
     });
+    tabla.appendChild(tbody);
+    resultadosDiv.appendChild(tabla);
   }
 
-  function stopScanner() {
-    if (currentScanner) {
-      currentScanner.stop().then(() => {
-        currentScanner.clear();
-        currentScanner = null;
-        document.getElementById("scannerModal").style.display = "none";
-      }).catch((e) => {
-        console.error("Error deteniendo el escáner:", e);
-      });
-    } else {
-      document.getElementById("scannerModal").style.display = "none";
-    }
+  // Modal instrucciones
+  function abrirInstrucciones() {
+    document.getElementById("modalInstrucciones").style.display = "flex";
+  }
+  function cerrarInstrucciones() {
+    document.getElementById("modalInstrucciones").style.display = "none";
   }
 
-  document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
-  document.getElementById("busqueda").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      buscar();
-    }
-  });
-
+  // Al cargar la página
   window.onload = () => {
     cargarSesion();
     cargarPrestamosDesdeSheets();
-  };
+  }
 </script>
-
  </body>
 </html>
