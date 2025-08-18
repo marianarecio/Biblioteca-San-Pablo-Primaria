@@ -237,8 +237,27 @@
 <!-- Modal de instrucciones -->
 <div id="modalInstrucciones" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
   <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; width: 400px; text-align: left; position: relative; font-family: 'Jost', sans-serif;">
-    <button onclick="cerrarInstrucciones()" style="position: absolute; top: 10px; right: 10px; background: #e57373; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer;">×</button>
-    <h2 style="margin-top: 0;">📖 Instrucciones</h2>
+    <button onclick="cerrarInstrucciones()" 
+  style="
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    background: #e57373; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 30px; 
+    height: 30px; 
+    font-size: 18px; 
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  ">
+  ×
+</button>
+
     <p style="font-size: 1em; line-height: 1.6;">
       Escaneá primero el código QR del <strong>responsable</strong> para iniciar. Este quedará grabado para el resto de la sesión, no es necesario que lo escaneés para cada préstamo a registrar.<br/><br/>
       Luego, escaneá el código QR del <strong>alumno</strong> y el del <strong>libro</strong> para registrar un préstamo. El sistema dará una alerta si el alumno tiene algún libro de la biblioteca, <strong>no podrá registrarse el préstamo excepto que devuelva el anterior</strong>.<br/><br/>
