@@ -406,7 +406,7 @@
   function registrarDevolucion(alumno, libro) {
     const ahora = new Date();
     const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    const devolucion = { responsable: responsableActual, libro, alumno, fecha };
+    const devolucion = { responsable: responsableActual, libro, alumno, fecha, tipo: "devolucion" };
 
     prestamosSesion.push(devolucion);
     prestamos.push(devolucion);
@@ -414,54 +414,60 @@
     actualizarTabla();
 
     fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(devolucion)
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(devolucion)
     });
 
     alert("¡Devolución registrada!");
-  }
+}
 
-  function registrarPrestamo() {
+ function registrarPrestamo() {
     if(devolviendo) {
-      alert("Por favor, terminá la devolución escaneando el libro.");
-      return;
+        alert("Por favor, terminá la devolución escaneando el libro.");
+        return;
     }
 
     if(!responsableActual) {
-      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
-      return;
+        alert("Primero escaneá el código QR del responsable para iniciar sesión.");
+        return;
     }
+
     const libro = document.getElementById('libroInput').value.trim();
     const alumno = document.getElementById('alumnoInput').value.trim();
     if (!libro || !alumno) {
-      alert("Escaneá primero el código QR del alumno y del libro");
-      return;
+        alert("Escaneá primero el código QR del alumno y del libro");
+        return;
     }
-   const ahora = new Date();
-   const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
+
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+    
+    // Determinar tipo según si alumno tiene préstamo activo
+    const tipo = tienePrestamoActivo(alumno) ? "devolucion" : "prestamo";
+
+    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha, tipo };
 
     prestamosSesion.push(nuevoPrestamo);
     prestamos.push(nuevoPrestamo);
     guardarSesion();
     actualizarTabla();
 
+    // Limpiar inputs
     document.getElementById('libroInput').value = "";
     document.getElementById('alumnoInput').value = "";
 
+    // Enviar a Google Sheets
     fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(nuevoPrestamo)
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(nuevoPrestamo)
     });
 
     alert("¡Préstamo registrado!");
-  }
+}
 
   function actualizarTabla() {
     const tabla = document.getElementById("prestamosTable");
@@ -501,67 +507,37 @@
     contenedor.innerHTML = html;
   }
 
-  // --- NUEVO: función para verificar si alumno tiene préstamo activo ---
-  function tienePrestamoActivo(alumno) {
-    // Consideramos préstamo activo si existe un préstamo sin que haya sido devuelto (es decir, no hay devolución con mismo libro+alumno después)
-    // Para simplificar, asumimos que el último registro para ese libro y alumno indica estado:
-    // - Si último registro para ese libro y alumno es un préstamo => está activo
-    // - Si último registro es devolución => no está activo
-    // Asumimos que las devoluciones también se guardan como registros con mismo formato.
+function tienePrestamoActivo(alumno) {
+  // Obtener todos los registros del alumno
+  const registrosAlumno = prestamos.filter(p => p.alumno === alumno);
 
-    // Busco todos los registros para alumno
-    const prestamosAlumno = prestamos
-      .filter(p => p.alumno === alumno);
+  // Crear un mapa para cada libro y su último registro
+  const librosUltimoRegistro = new Map();
 
-    // Ordeno por fecha ascendente para determinar estado final
-    // Asumo que fecha es string, la convierto a Date para comparar
-    prestamosAlumno.sort((a,b) => {
-      // Asumo formato: "dd/mm/yyyy hh:mm"
-      const parseFecha = (f) => {
-        const [datePart,timePart] = f.split(" ");
-        const [dd,mm,yyyy] = datePart.split("/");
-        const [hh,mi] = timePart.split(":");
-        return new Date(yyyy, mm-1, dd, hh, mi);
-      };
-      return parseFecha(a.fecha) - parseFecha(b.fecha);
-    });
-
-    // Recorro registros y verifico el estado último del libro(s) del alumno
-    // Si el último registro para libro es préstamo -> activo, si devolución -> no activo
-    // Entonces busco los libros prestados y si hay alguno sin devolución
-
-    // Para cada libro que el alumno tiene en préstamos, verifico si la última acción fue préstamo o devolución
-
-    // Obtener libros distintos que el alumno tiene
-    const librosAlumno = [...new Set(prestamosAlumno.map(p => p.libro))];
-
-    for (const libro of librosAlumno) {
-      // Filtro registros para ese libro
-      const registrosLibro = prestamosAlumno.filter(p => p.libro === libro);
-
-      // Último registro para libro
-      const ultimoRegistro = registrosLibro[registrosLibro.length -1];
-
-      // Para distinguir préstamo vs devolución: asumimos que
-      // Préstamo: registro creado con alumno+libro, devolución: mismo alumno+libro pero se registra cuando devuelve
-      // Si no se registran de forma explícita diferente, podemos usar una marca.
-      // Como no hay marca, vamos a asumir que cuando se registra un préstamo nuevo con mismo alumno y libro, es préstamo, y cuando se registra una devolución, también con mismo alumno y libro, es devolución.
-      // Pero no hay campo para distinguir.
-
-      // Para diferenciar, usamos un truco: si hay más de una entrada para ese libro y alumno, la última entrada es:
-      // - devolución si el número de registros es par (préstamo + devolución)
-      // - préstamo si es impar (único préstamo sin devolución)
-
-      // O mejor: cada registro nuevo con mismo alumno y libro es alternadamente préstamo o devolución.
-
-      // Por eso, si la cantidad de registros para libro es impar, hay un préstamo activo
-      if(registrosLibro.length % 2 === 1) {
-        return true; // tiene préstamo activo
+  registrosAlumno.forEach(p => {
+    const key = p.libro;
+    const fechaRegistro = new Date(p.fecha.split(" ")[0].split("/").reverse().join("-") + "T" + p.fecha.split(" ")[1]);
+    
+    if (!librosUltimoRegistro.has(key)) {
+      librosUltimoRegistro.set(key, { fecha: fechaRegistro, tipo: p.tipo });
+    } else {
+      const actual = librosUltimoRegistro.get(key);
+      if (fechaRegistro > actual.fecha) {
+        librosUltimoRegistro.set(key, { fecha: fechaRegistro, tipo: p.tipo });
       }
     }
+  });
 
-    return false; // no tiene préstamo activo
+  // Verificar si algún libro tiene préstamo activo
+  for (const [libro, registro] of librosUltimoRegistro.entries()) {
+    if (registro.tipo === "prestamo") {
+      return true; // Tiene al menos un préstamo activo
+    }
   }
+
+  return false; // Ningún préstamo activo
+}
+
 
   // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
   let currentScanner = null;
