@@ -402,71 +402,77 @@
     }
   }
 
-  // --- Función para registrar devolución ---
-  function registrarDevolucion(alumno, libro) {
-    const ahora = new Date();
-    const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    const devolucion = { responsable: responsableActual, libro, alumno, fecha, tipo: "devolucion" };
+  // Registrar devolución
+async function registrarDevolucion(alumno, libro) {
+  const ahora = new Date();
+  const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+  const devolucion = { responsable: responsableActual, libro, alumno, fecha, tipo: "devolucion" };
 
-    prestamosSesion.push(devolucion);
-    prestamos.push(devolucion);
-    guardarSesion();
-    actualizarTabla();
+  prestamosSesion.push(devolucion);
+  prestamos.push(devolucion);
+  guardarSesion();
+  actualizarTabla();
 
-    fetch(SHEETS_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(devolucion)
+  try {
+    const resp = await fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(devolucion)
     });
-
+    if (!resp.ok) throw new Error("Error enviando devolución a Sheets");
     alert("¡Devolución registrada!");
+  } catch(err) {
+    console.error(err);
+    alert("No se pudo registrar la devolución en Sheets. Revisa tu conexión o la URL del webhook.");
+  }
 }
 
- function registrarPrestamo() {
-    if(devolviendo) {
-        alert("Por favor, terminá la devolución escaneando el libro.");
-        return;
-    }
+// Registrar préstamo
+async function registrarPrestamo() {
+  if(devolviendo) {
+      alert("Por favor, terminá la devolución escaneando el libro.");
+      return;
+  }
 
-    if(!responsableActual) {
-        alert("Primero escaneá el código QR del responsable para iniciar sesión.");
-        return;
-    }
+  if(!responsableActual) {
+      alert("Primero escaneá el código QR del responsable para iniciar sesión.");
+      return;
+  }
 
-    const libro = document.getElementById('libroInput').value.trim();
-    const alumno = document.getElementById('alumnoInput').value.trim();
-    if (!libro || !alumno) {
-        alert("Escaneá primero el código QR del alumno y del libro");
-        return;
-    }
+  const libro = document.getElementById('libroInput').value.trim();
+  const alumno = document.getElementById('alumnoInput').value.trim();
+  if (!libro || !alumno) {
+      alert("Escaneá primero el código QR del alumno y del libro");
+      return;
+  }
 
-    const ahora = new Date();
-    const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-    
-    // Determinar tipo según si alumno tiene préstamo activo
-    const tipo = tienePrestamoActivo(alumno) ? "devolucion" : "prestamo";
+  const ahora = new Date();
+  const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
 
-    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha, tipo };
+  const tipo = tienePrestamoActivo(alumno) ? "devolucion" : "prestamo";
+  const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha, tipo };
 
-    prestamosSesion.push(nuevoPrestamo);
-    prestamos.push(nuevoPrestamo);
-    guardarSesion();
-    actualizarTabla();
+  prestamosSesion.push(nuevoPrestamo);
+  prestamos.push(nuevoPrestamo);
+  guardarSesion();
+  actualizarTabla();
 
-    // Limpiar inputs
-    document.getElementById('libroInput').value = "";
-    document.getElementById('alumnoInput').value = "";
+  // Limpiar inputs
+  document.getElementById('libroInput').value = "";
+  document.getElementById('alumnoInput').value = "";
 
-    // Enviar a Google Sheets
-    fetch(SHEETS_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(nuevoPrestamo)
+  try {
+    const resp = await fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(nuevoPrestamo)
     });
-
+    if (!resp.ok) throw new Error("Error enviando préstamo a Sheets");
     alert("¡Préstamo registrado!");
+  } catch(err) {
+    console.error(err);
+    alert("No se pudo registrar el préstamo en Sheets. Revisa tu conexión o la URL del webhook.");
+  }
 }
 
   function actualizarTabla() {
