@@ -3,9 +3,11 @@
  <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Biblioteca Primaria Colegio San Pablo</title>
+  <title>
+   Biblioteca Primaria Colegio San Pablo
+  </title>
   <!-- Fuente Jost -->
-  <link href="https://fonts.googleapis.com/css2?family=Jost&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Jost&amp;display=swap" rel="stylesheet"/>
   <style>
    body {
       font-family: 'Jost', sans-serif;
@@ -136,7 +138,9 @@
       color: #555;
     }
 
-    input[type="text"] { cursor: pointer; }
+    input[type="text"] {
+      cursor: pointer;
+    }
 
     #resultadosBusqueda {
       margin: 30px auto;
@@ -153,83 +157,140 @@
       margin-left: auto;
       margin-right: auto;
     }
-    .search-box { margin-bottom: 18px; }
+    .search-box {
+      margin-bottom: 18px;
+    }
 
     /* --- Mejoras para móviles --- */
     @media (max-width: 600px) {
-      body { padding: 8px; }
-      #top-image { max-width: 90vw; max-height: 140px; }
-      h1 { font-size: 1.5em; }
-      table { font-size: 0.95em; width: 100%; max-width: 100vw; }
-      .input-with-icon { width: 95vw; max-width: 98vw; }
-      .input-with-icon input { font-size: 1em; }
-      .search-label { max-width: 95vw; }
-      button { width: 90vw; max-width: 95vw; margin-top: 8px; margin-bottom: 8px; font-size: 1.1em; display: block; margin-left: auto; margin-right: auto; }
-      #scanner { width: 90vw !important; height: 90vw !important; border-radius: 12px; }
-      #scannerModal { align-items: flex-start; padding-top: 60px; }
-    }
+      body {
+        padding: 8px;
+      }
+      #top-image {
+        max-width: 90vw;
+        max-height: 140px;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      table {
+        font-size: 0.95em;
+        width: 100%;
+        max-width: 100vw;
+      }
+      .input-with-icon {
+        width: 95vw;
+        max-width: 98vw;
+      }
+      .input-with-icon input {
+        font-size: 1em;
+      }
+      .search-label {
+        max-width: 95vw;
+      }
+      button {
+        width: 90vw;
+        max-width: 95vw;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #scanner {
+        width: 90vw !important;
+        height: 90vw !important;
+        border-radius: 12px;
+      }
+      #scannerModal {
+        align-items: flex-start;
+        padding-top: 60px;
+      }
+#busqueda {
+  width: 80%;
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  cursor: text;
+}
+.estilo-busqueda {
+  width: 80%;
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  background-color: white;
+  color: #333;
+  text-align: left;
+}
 
-    #busqueda {
-      width: 80%;
-      max-width: 400px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 20px;
-      box-sizing: border-box;
-      cursor: text;
-    }
-    .estilo-busqueda {
-      width: 80%;
-      max-width: 400px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      background-color: white;
-      color: #333;
-      text-align: left;
-    }
   </style>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
  </head>
+<!-- Modal de instrucciones -->
+<div id="modalInstrucciones" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
+  <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; width: 400px; text-align: left; position: relative; font-family: 'Jost', sans-serif;">
+    <button onclick="cerrarInstrucciones()" 
+  style="
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    background: #e57373; 
+    color: white; 
+    border: none; 
+    border-radius: 50%; 
+    width: 30px; 
+    height: 30px; 
+    font-size: 18px; 
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  ">
+  ×
+</button>
+
+    <p style="font-size: 1em; line-height: 1.6;">
+      Escaneá primero el código QR del <strong>responsable</strong> para iniciar. Este quedará grabado para el resto de la sesión, no es necesario que lo escaneés para cada préstamo a registrar.<br/><br/>
+      Luego, escaneá el código QR del <strong>alumno</strong> y el del <strong>libro</strong> para registrar un préstamo. El sistema dará una alerta si el alumno tiene algún libro de la biblioteca, <strong>no podrá registrarse el préstamo excepto que devuelva el anterior</strong>.<br/><br/>
+      
+     En la tabla de <strong>"Préstamos Registrados"</strong> podrás visualizar los registros que hiciste en esta sesión.<br/><br/>
+     Para saber si un libro se encuentra <strong>disponible</strong> o en <strong>circulación</strong> utilizá la barra de búsqueda.<br/><br/>
+     También podés realizar la <strong>búsqueda por alumno</strong> para conocer el listado de libros que leyó en el año.
+    </p>
+  </div>
+</div>
+
+
  <body>
   <!-- Imagen escudo en el encabezado -->
   <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
-  <h1>📚 Biblioteca Primaria Colegio San Pablo</h1>
+  <h1>
+   📚 Biblioteca Primaria Colegio San Pablo
+  </h1>
   <p style="font-size:1em; color:#666; margin-bottom:14px;">
-   Si estás usando un celular, acepta el permiso de cámara para escanear códigos QR.
+   Si est&aacute;s usando un celular, acepta el permiso de c&aacute;mara para escanear c&oacute;digos QR.
   </p>
   <!-- Botón para mostrar instrucciones -->
   <div style="margin-top: 10px;">
     <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
   </div>
-  <!-- Modal de instrucciones -->
-  <div id="modalInstrucciones" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; width: 400px; text-align: left; position: relative; font-family: 'Jost', sans-serif;">
-      <button onclick="cerrarInstrucciones()" 
-        style="position: absolute; top: 10px; right: 10px; background: #e57373; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; padding: 0; display: flex; justify-content: center; align-items: center;">×</button>
-
-      <p style="font-size: 1em; line-height: 1.6;">
-        Escaneá primero el código QR del <strong>responsable</strong> para iniciar. Este quedará grabado para el resto de la sesión, no es necesario que lo escaneés para cada préstamo a registrar.<br/><br/>
-        Luego, escaneá el código QR del <strong>alumno</strong> y el del <strong>libro</strong> para registrar un préstamo. El sistema dará una alerta si el alumno tiene algún libro de la biblioteca, <strong>no podrá registrarse el préstamo excepto que devuelva el anterior</strong>.<br/><br/>
-        En la tabla de <strong>"Préstamos Registrados"</strong> podrás visualizar los registros que hiciste en esta sesión.<br/><br/>
-        Para saber si un libro se encuentra <strong>disponible</strong> o en <strong>circulación</strong> utilizá la barra de búsqueda.<br/><br/>
-        También podés realizar la <strong>búsqueda por alumno</strong> para conocer el listado de libros que leyó en el año.
-      </p>
-    </div>
-  </div>
-  <script>
-    function abrirInstrucciones() {
-      document.getElementById("modalInstrucciones").style.display = "flex";
-    }
-    function cerrarInstrucciones() {
-      document.getElementById("modalInstrucciones").style.display = "none";
-    }
-  </script>
-
+<script>
+  function abrirInstrucciones() {
+    document.getElementById("modalInstrucciones").style.display = "flex";
+  }
+  function cerrarInstrucciones() {
+    document.getElementById("modalInstrucciones").style.display = "none";
+  }
+</script>
   <div class="input-with-icon" onclick="startScanner('responsableInput')">
     <input id="responsableInput" placeholder="Escaneá el QR del responsable" readonly type="text" />
     <span class="icon-camera">📷</span>
@@ -246,30 +307,48 @@
   </div>
 
   <button id="registrarBtn" onclick="registrarPrestamo()" style="background-color:#4a4e69;">
-    Registrar Préstamo
+    Registrar Pr&eacute;stamo
   </button>
 
-  <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">📋 Préstamos Registrados</h2>
+  <h2 style="font-size: 2em; margin-top: 40px; margin-bottom: 20px;">
+   📋 Pr&eacute;stamos Registrados
+  </h2>
   <table>
-    <thead>
-      <tr>
-        <th>Responsable</th>
-        <th>Libro</th>
-        <th>Alumno</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody id="prestamosTable"></tbody>
+   <thead>
+    <tr>
+     <th>
+      Responsable
+     </th>
+     <th>
+      Libro
+     </th>
+     <th>
+      Alumno
+     </th>
+     <th>
+      Fecha
+     </th>
+    </tr>
+   </thead>
+   <tbody id="prestamosTable">
+   </tbody>
   </table>
 
   <div class="search-box">
-    <h3>🔍 Buscar información</h3>
-    <label class="search-label" for="busqueda">Buscar por libro o alumno</label>
-    <input id="busqueda" placeholder="Ej: Título del libro o Apellido de alumno" type="text"
-      style="width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; background-color: white; color: #333; text-align: left;"/>
-    <button onclick="buscar()">Buscar</button>
+   <h3>
+    🔍 Buscar informaci&oacute;n
+   </h3>
+   <label class="search-label" for="busqueda">
+    Buscar por libro o alumno
+   </label>
+<input id="busqueda" placeholder="Ej: Título del libro o Apellido de alumno" type="text"
+ style="width: 80%; max-width: 400px; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; background-color: white; color: #333; text-align: left;"/>
+   <button onclick="buscar()">
+    Buscar
+   </button>
   </div>
-  <div id="resultadosBusqueda"></div>
+  <div id="resultadosBusqueda">
+  </div>
 
   <!-- Modal con el escáner -->
   <div id="scannerModal">
@@ -282,20 +361,8 @@
 
   let prestamos = [];         
   let prestamosSesion = [];   
-  let responsableActual = null;  
-  let devolviendo = false;      
-  let datosListos = false;      
-
-  // Utilidad: fecha consistente dd/mm/yyyy hh:mm
-  function fechaAhoraAR(){
-    const d=new Date();
-    const dd=String(d.getDate()).padStart(2,'0');
-    const mm=String(d.getMonth()+1).padStart(2,'0');
-    const yyyy=d.getFullYear();
-    const hh=String(d.getHours()).padStart(2,'0');
-    const mi=String(d.getMinutes()).padStart(2,'0');
-    return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
-  }
+  let responsableActual = null;  // Guardo el responsable escaneado para la sesión
+  let devolviendo = false;      // <-- Estado para controlar si estamos en proceso de devolución
 
   async function cargarPrestamosDesdeSheets() {
     try {
@@ -307,13 +374,9 @@
         alumno: item.Alumno,
         libro: item.Libro,
         fecha: item.Fecha,
-        // Si tu hoja ya guarda un campo Tipo, lo tomamos; si no, quedan sin tipo y aplicamos fallback por paridad
-        tipo: item.Tipo || undefined
       }));
-      datosListos = true;
     } catch (error) {
       console.error("No se pudieron cargar los préstamos:", error);
-      datosListos = true; // evitamos bloquear el flujo; trabajamos con lo que haya en memoria
     }
   }
 
@@ -334,14 +397,16 @@
     if(responsableGuardado) {
       responsableActual = responsableGuardado;
       document.getElementById("responsableInput").value = responsableActual;
+      // Bloqueo el input para que no se pueda cambiar hasta que cierre sesión (o refresque)
       document.getElementById("responsableInput").setAttribute("readonly", true);
     }
   }
 
-  // --- Registrar devolución ---
+  // --- Función para registrar devolución ---
   function registrarDevolucion(alumno, libro) {
-    const fecha = fechaAhoraAR();
-    const devolucion = { responsable: responsableActual, libro, alumno, fecha, tipo: "devolucion" };
+    const ahora = new Date();
+    const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+    const devolucion = { responsable: responsableActual, libro, alumno, fecha };
 
     prestamosSesion.push(devolucion);
     prestamos.push(devolucion);
@@ -351,6 +416,7 @@
     fetch(SHEETS_WEBHOOK_URL, {
       method: 'POST',
       mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(devolucion)
     });
 
@@ -373,9 +439,9 @@
       alert("Escaneá primero el código QR del alumno y del libro");
       return;
     }
-
-    const fecha = fechaAhoraAR();
-    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha, tipo: "prestamo" };
+   const ahora = new Date();
+   const fecha = ahora.toLocaleDateString('es-AR') + " " + ahora.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+    const nuevoPrestamo = { responsable: responsableActual, libro, alumno, fecha };
 
     prestamosSesion.push(nuevoPrestamo);
     prestamos.push(nuevoPrestamo);
@@ -388,6 +454,9 @@
     fetch(SHEETS_WEBHOOK_URL, {
       method: 'POST',
       mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(nuevoPrestamo)
     });
 
@@ -399,95 +468,109 @@
     tabla.innerHTML = "";
     prestamosSesion.forEach(p => {
       const fila = tabla.insertRow();
-      fila.insertCell(0).textContent = p.responsable || '';
-      fila.insertCell(1).textContent = p.libro || '';
-      fila.insertCell(2).textContent = p.alumno || '';
-      fila.insertCell(3).textContent = p.fecha || '';
+      fila.insertCell(0).textContent = p.responsable;
+      fila.insertCell(1).textContent = p.libro;
+      fila.insertCell(2).textContent = p.alumno;
+      fila.insertCell(3).textContent = p.fecha;
     });
   }
 
   function buscar() {
     const consulta = document.getElementById("busqueda").value.toLowerCase().trim();
-    const contenedor = document.getElementById("resultadosBusqueda");
-    contenedor.innerHTML = "";
-    if (!consulta) return;
-
-    const resultados = prestamos.filter(p =>
-      (p.libro||'').toLowerCase().includes(consulta) || (p.alumno||'').toLowerCase().includes(consulta)
-    );
-
-    if (resultados.length === 0) {
-      const s = document.createElement('strong');
-      s.textContent = `No se encontraron resultados para "${consulta}"`;
-      contenedor.appendChild(s);
+    if (!consulta) {
+      document.getElementById("resultadosBusqueda").innerHTML = "";
       return;
     }
-
-    const s = document.createElement('strong');
-    s.textContent = `Resultados para "${consulta}"`;
-    const ul = document.createElement('ul');
-    resultados.forEach(p => {
-      const li = document.createElement('li');
-      li.textContent = `Libro: ${p.libro} | Alumno: ${p.alumno} | Fecha: ${p.fecha}`;
-      ul.appendChild(li);
-    });
-    contenedor.appendChild(s);
-    contenedor.appendChild(ul);
+    const resultados = prestamos.filter(p =>
+      p.libro.toLowerCase().includes(consulta) || p.alumno.toLowerCase().includes(consulta)
+    );
+    mostrarResultados("Búsqueda", consulta, resultados);
   }
 
-  // Verifica si el alumno tiene préstamo activo.
-  // Fallback: si NO hay 'tipo' en los registros de un libro, usamos la paridad (ímpar = activo) para mantener compatibilidad con datos viejos.
-  function tienePrestamoActivo(alumno) {
-    const registrosAlumno = prestamos.filter(p => (p.alumno||'').trim() === alumno);
+  function mostrarResultados(tipo, consulta, resultados) {
+    const contenedor = document.getElementById("resultadosBusqueda");
+    if (resultados.length === 0) {
+      contenedor.innerHTML = `<strong>No se encontraron resultados para ${tipo}: "${consulta}"</strong>`;
+      return;
+    }
+    let html = `<strong>Resultados para ${tipo}: "${consulta}"</strong><ul>`;
+    resultados.forEach(p => {
+      html += `<li><strong>Libro:</strong> ${p.libro} | <strong>Alumno:</strong> ${p.alumno} | <strong>Fecha:</strong> ${p.fecha}</li>`;
+    });
+    html += "</ul>";
+    contenedor.innerHTML = html;
+  }
 
-    // Agrupar por libro
-    const porLibro = new Map();
-    registrosAlumno.forEach(p => {
-      const key = (p.libro||'').trim();
-      if(!key) return;
-      if(!porLibro.has(key)) porLibro.set(key, []);
-      porLibro.get(key).push(p);
+  // --- NUEVO: función para verificar si alumno tiene préstamo activo ---
+  function tienePrestamoActivo(alumno) {
+    // Consideramos préstamo activo si existe un préstamo sin que haya sido devuelto (es decir, no hay devolución con mismo libro+alumno después)
+    // Para simplificar, asumimos que el último registro para ese libro y alumno indica estado:
+    // - Si último registro para ese libro y alumno es un préstamo => está activo
+    // - Si último registro es devolución => no está activo
+    // Asumimos que las devoluciones también se guardan como registros con mismo formato.
+
+    // Busco todos los registros para alumno
+    const prestamosAlumno = prestamos
+      .filter(p => p.alumno === alumno);
+
+    // Ordeno por fecha ascendente para determinar estado final
+    // Asumo que fecha es string, la convierto a Date para comparar
+    prestamosAlumno.sort((a,b) => {
+      // Asumo formato: "dd/mm/yyyy hh:mm"
+      const parseFecha = (f) => {
+        const [datePart,timePart] = f.split(" ");
+        const [dd,mm,yyyy] = datePart.split("/");
+        const [hh,mi] = timePart.split(":");
+        return new Date(yyyy, mm-1, dd, hh, mi);
+      };
+      return parseFecha(a.fecha) - parseFecha(b.fecha);
     });
 
-    const parseFecha = (f) => {
-      if (!f) return 0;
-      // ISO
-      if (/\d{4}-\d{2}-\d{2}/.test(f)) return new Date(f.replace(' ', 'T')).getTime();
-      // dd/mm/yyyy hh:mm
-      const [datePart, timePart = '00:00'] = String(f).split(' ');
-      const [dd, mm, yyyy] = datePart.split('/').map(n => parseInt(n,10));
-      const [hh = 0, mi = 0] = timePart.split(':').map(n => parseInt(n,10));
-      return new Date(yyyy, (mm||1)-1, dd||1, hh, mi).getTime();
-    };
+    // Recorro registros y verifico el estado último del libro(s) del alumno
+    // Si el último registro para libro es préstamo -> activo, si devolución -> no activo
+    // Entonces busco los libros prestados y si hay alguno sin devolución
 
-    for (const [libro, arr] of porLibro.entries()) {
-      arr.sort((a,b) => parseFecha(a.fecha) - parseFecha(b.fecha));
-      const todosConTipo = arr.every(x => !!x.tipo);
-      if (todosConTipo) {
-        const ultimo = arr[arr.length - 1];
-        if (ultimo && ultimo.tipo !== 'devolucion') return true; // último es préstamo
-      } else {
-        // Compatibilidad: si no hay tipo, usamos paridad (ímpar = activo)
-        if (arr.length % 2 === 1) return true;
+    // Para cada libro que el alumno tiene en préstamos, verifico si la última acción fue préstamo o devolución
+
+    // Obtener libros distintos que el alumno tiene
+    const librosAlumno = [...new Set(prestamosAlumno.map(p => p.libro))];
+
+    for (const libro of librosAlumno) {
+      // Filtro registros para ese libro
+      const registrosLibro = prestamosAlumno.filter(p => p.libro === libro);
+
+      // Último registro para libro
+      const ultimoRegistro = registrosLibro[registrosLibro.length -1];
+
+      // Para distinguir préstamo vs devolución: asumimos que
+      // Préstamo: registro creado con alumno+libro, devolución: mismo alumno+libro pero se registra cuando devuelve
+      // Si no se registran de forma explícita diferente, podemos usar una marca.
+      // Como no hay marca, vamos a asumir que cuando se registra un préstamo nuevo con mismo alumno y libro, es préstamo, y cuando se registra una devolución, también con mismo alumno y libro, es devolución.
+      // Pero no hay campo para distinguir.
+
+      // Para diferenciar, usamos un truco: si hay más de una entrada para ese libro y alumno, la última entrada es:
+      // - devolución si el número de registros es par (préstamo + devolución)
+      // - préstamo si es impar (único préstamo sin devolución)
+
+      // O mejor: cada registro nuevo con mismo alumno y libro es alternadamente préstamo o devolución.
+
+      // Por eso, si la cantidad de registros para libro es impar, hay un préstamo activo
+      if(registrosLibro.length % 2 === 1) {
+        return true; // tiene préstamo activo
       }
     }
-    return false;
+
+    return false; // no tiene préstamo activo
   }
 
-  // Código para el escáner QR (con limpieza robusta)
+  // Código para el escáner QR (modificado para encadenar escaneo alumno -> libro)
   let currentScanner = null;
-
-  async function cleanupScanner() {
+  function startScanner(inputId) {
     if (currentScanner) {
-      try { await currentScanner.stop(); } catch (e) {}
-      try { await currentScanner.clear(); } catch (e) {}
-      currentScanner = null;
+      currentScanner.clear().then(() => {
+        document.getElementById("scannerModal").style.display = "none";
+      });
     }
-  }
-
-  async function startScanner(inputId) {
-    await cleanupScanner();
-
     const scannerModal = document.getElementById("scannerModal");
     scannerModal.style.display = "flex";
     scannerModal.dataset.inputId = inputId;
@@ -499,71 +582,76 @@
 
     currentScanner.start(
       { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 280, height: 280 } },
+      {
+        fps: 10,
+        qrbox: { width: 280, height: 280 }
+      },
       qrCodeMessage => {
-        // --- Lógica especial para alumno: verifica préstamos activos ---
-        if (inputId === "alumnoInput") {
-          if (devolviendo) {
+        // --- NUEVO: lógica especial para escanear alumno y controlar devolución ---
+        if(inputId === "alumnoInput") {
+          // Si ya estamos en modo devolución, ignoramos porque debe escanear libro
+          if(devolviendo) {
             alert("Primero escaneá el libro para devolver.");
             return;
           }
           document.getElementById(inputId).value = qrCodeMessage;
           const alumnoEscaneado = qrCodeMessage.trim();
 
-          if (!datosListos) {
-            alert("Cargando datos de la biblioteca. Intentá nuevamente en unos segundos.");
-            stopScanner();
-            return;
-          }
-
-          if (tienePrestamoActivo(alumnoEscaneado)) {
-            devolviendo = true;
+          // Verifico si tiene préstamo activo
+          if(tienePrestamoActivo(alumnoEscaneado)) {
+            devolviendo = true; // activo modo devolución
             alert("El alumno tiene préstamos activos. Por favor, escaneá el libro para devolver antes de hacer un nuevo préstamo.");
             stopScanner();
-            setTimeout(() => startScanner("libroInput"), 400);
+            // Abrir escáner para libro para devolución
+            setTimeout(() => startScanner("libroInput"), 500);
             return;
           } else {
+            // No tiene préstamo activo, paso a escanear libro para nuevo préstamo
             stopScanner();
-            setTimeout(() => startScanner("libroInput"), 200);
+            setTimeout(() => startScanner("libroInput"), 500);
             return;
           }
         }
 
-        if (inputId === "libroInput") {
+        // Cuando escaneamos libro:
+        if(inputId === "libroInput") {
           const libroEscaneado = qrCodeMessage.trim();
           document.getElementById(inputId).value = libroEscaneado;
 
-          if (devolviendo) {
+          if(devolviendo) {
+            // Estamos en modo devolución: registrar devolución del libro para el alumno que está en alumnoInput
             const alumnoActual = document.getElementById("alumnoInput").value.trim();
-            if (!alumnoActual) {
-              alert("Primero escaneá el alumno.");
-              stopScanner();
-              return;
-            }
             registrarDevolucion(alumnoActual, libroEscaneado);
+
             devolviendo = false;
+
+            // Limpio inputs libro y alumno para nuevo préstamo
             document.getElementById("libroInput").value = "";
             document.getElementById("alumnoInput").value = "";
+
+            // Abrir escáner para alumno para nuevo préstamo
             stopScanner();
-            setTimeout(() => startScanner("alumnoInput"), 400);
+            setTimeout(() => startScanner("alumnoInput"), 500);
             return;
           } else {
+            // Si no estamos en devolución, solo ponemos el valor y cerramos escáner
             stopScanner();
             return;
           }
         }
 
-        if (inputId === "responsableInput") {
+        // Cuando escaneamos responsable
+        if(inputId === "responsableInput") {
           responsableActual = qrCodeMessage.trim();
           sessionStorage.setItem("responsableActual", responsableActual);
-          const inp = document.getElementById("responsableInput");
-          inp.value = responsableActual;
-          inp.setAttribute("readonly", true);
+          document.getElementById("responsableInput").value = responsableActual;
+          document.getElementById("responsableInput").setAttribute("readonly", true);
           stopScanner();
           return;
         }
+
       },
-      errorMessage => { /* silencioso para no saturar */ }
+      errorMessage => {}
     ).catch(err => {
       alert("No se pudo acceder a la cámara");
       stopScanner();
@@ -578,7 +666,6 @@
         document.getElementById("scannerModal").style.display = "none";
       }).catch((e) => {
         console.error("Error deteniendo el escáner:", e);
-        document.getElementById("scannerModal").style.display = "none";
       });
     } else {
       document.getElementById("scannerModal").style.display = "none";
@@ -587,14 +674,18 @@
 
   document.getElementById("closeScannerBtn").addEventListener("click", stopScanner);
   document.getElementById("busqueda").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") buscar();
+    if (event.key === "Enter") {
+      buscar();
+    }
   });
 
-  window.addEventListener('load', async () => {
+  window.onload = () => {
     cargarSesion();
-    await cargarPrestamosDesdeSheets();
-  });
+    cargarPrestamosDesdeSheets();
+  };
 </script>
 
  </body>
 </html>
+
+ 
