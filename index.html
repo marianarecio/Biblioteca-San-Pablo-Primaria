@@ -234,6 +234,19 @@
   </style>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
  </head>
+ <body>
+  <!-- Imagen escudo en el encabezado -->
+  <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
+  <h1>
+   📚 Biblioteca Primaria Colegio San Pablo
+  </h1>
+  <p style="font-size:1em; color:#666; margin-bottom:14px;">
+   Si est&aacute;s usando un celular, acepta el permiso de c&aacute;mara para escanear c&oacute;digos QR.
+  </p>
+  <!-- Botón para mostrar instrucciones -->
+  <div style="margin-top: 10px;">
+    <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
+  </div>
 <!-- Modal de instrucciones -->
 <div id="modalInstrucciones" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
   <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; width: 400px; text-align: left; position: relative; font-family: 'Jost', sans-serif;">
@@ -268,22 +281,7 @@
     </p>
   </div>
 </div>
-
-
- <body>
-  <!-- Imagen escudo en el encabezado -->
-  <img alt="Escudo Colegio San Pablo" id="top-image" src="https://csanpablo.edu.ar/wp-content/uploads/2022/07/escudo-centro-232x300.png"/>
-  <h1>
-   📚 Biblioteca Primaria Colegio San Pablo
-  </h1>
-  <p style="font-size:1em; color:#666; margin-bottom:14px;">
-   Si est&aacute;s usando un celular, acepta el permiso de c&aacute;mara para escanear c&oacute;digos QR.
-  </p>
-  <!-- Botón para mostrar instrucciones -->
-  <div style="margin-top: 10px;">
-    <button onclick="abrirInstrucciones()">¿Cómo se usa esta página web?</button>
-  </div>
-<script>
+  <script>
   function abrirInstrucciones() {
     document.getElementById("modalInstrucciones").style.display = "flex";
   }
